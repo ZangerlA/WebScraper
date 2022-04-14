@@ -10,5 +10,6 @@ public enum Language {
     DA,
     RU,
     JA,
-    ZH
+    ZH,
+    NONE
 }

@@ -1,12 +1,13 @@
 import java.io.File;
+import java.util.ArrayList;
 
 public class WebScraper {
 
-    private String url;
     private Language targetLanguage;
     private int searchDepth;
     private File file;
     private MarkdownWriter markdownWriter;
+    private ArrayList<ScrapeData> scrapedData;
 
     public WebScraper(String url) {
         //TODO
@@ -25,14 +26,31 @@ public class WebScraper {
     }
 
     public void scrape() {
+        getLinks(searchDepth);
+        getHeaders();
+        if (shouldTranslate()) {
+            translate();
+        }
+        writeToFile();
+    }
+
+    private void getLinks(int currentDepth) {
         //TODO
     }
 
-    private void getLinksFromPage(int currentDepth) {
+    private void getHeaders() {
         //TODO
     }
 
-    private void getHeadersFromPage() {
+    private void translate() {
         //TODO
+    }
+
+    private void writeToFile() {
+        //TODO
+    }
+
+    private boolean shouldTranslate() {
+        return this.targetLanguage != Language.NONE;
     }
 }
