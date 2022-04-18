@@ -1,40 +1,50 @@
 import java.util.ArrayList;
 
 public class ScrapeData {
-    private String URL;
-    private int URLDepth;
-    private ArrayList<Header> headers;
+	private String URL;
+	private int URLDepth;
 
-    public ScrapeData() {
-        headers = new ArrayList<>();
-    }
+	private boolean isBrokenURL;
+	private final ArrayList<Header> headers;
 
-    public String getURL() {
-        return URL;
-    }
+	public ScrapeData() {
+		headers = new ArrayList<>();
+	}
 
-    public void setURL(String URL) {
-        this.URL = URL;
-    }
+	public String getURL() {
+		return URL;
+	}
 
-    public int getURLDepth() {
-        return URLDepth;
-    }
+	public void setURL(String URL) {
+		this.URL = URL;
+	}
 
-    public void setURLDepth(int URLDepth) {
-        this.URLDepth = URLDepth;
-    }
+	public int getURLDepth() {
+		return URLDepth;
+	}
 
-    public ArrayList<Header> getHeaders() {
-        ArrayList<Header> headersCopy = new ArrayList<>();
-        for (Header header : this.headers) {
-            headersCopy.add(header);
-        }
-        return headersCopy;
-    }
+	public void setURLDepth(int URLDepth) {
+		this.URLDepth = URLDepth;
+	}
 
-    public void addHeader(Header header) {
-        headers.add(header);
-    }
+	public ArrayList<Header> getHeaders() {
+		ArrayList<Header> headersCopy = new ArrayList<>();
+		for (Header header : this.headers) {
+			headersCopy.add(header);
+		}
+		return headersCopy;
+	}
+
+	public boolean isBrokenURL() {
+		return isBrokenURL;
+	}
+
+	public void setBrokenURL(boolean brokenURL) {
+		isBrokenURL = brokenURL;
+	}
+
+	public void addHeader(Header header) {
+		headers.add(header);
+	}
 
 }
