@@ -1,13 +1,13 @@
 import java.util.ArrayList;
 
-public class ScrapeData {
+public class Link {
 	private String URL;
 	private int URLDepth;
 
 	private boolean isBrokenURL;
 	private final ArrayList<Header> headers;
 
-	public ScrapeData() {
+	public Link() {
 		headers = new ArrayList<>();
 	}
 

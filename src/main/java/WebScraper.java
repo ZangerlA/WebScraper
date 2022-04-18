@@ -7,7 +7,7 @@ public class WebScraper {
     private int searchDepth;
     private File file;
     private MarkdownWriter markdownWriter;
-    private ArrayList<ScrapeData> scrapedData;
+    private ArrayList<Link> scrapedData;
 
     public WebScraper(String url) {
         //TODO

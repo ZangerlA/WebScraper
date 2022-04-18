@@ -22,18 +22,20 @@ public class MarkdownWriter {
 		fileWriter = new FileWriter(this.file, appendMode);
 	}
 
-	public void writeToFile(List<ScrapeData> scrapeData) throws IOException {
-		for (ScrapeData data : scrapeData) {
+	public void writeToFile(List<Link> scrapeData) throws IOException {
+		for (Link data : scrapeData) {
 			fileWriter.write(buildMarkdownFromLink(data));
+			writeNewLine(1);
 			for (Header header : data.getHeaders()) {
 				fileWriter.write(buildMarkdownFromHeader(header));
+				writeNewLine(1);
 			}
-			writeEmptyLine();
+			writeNewLine(1);
 		}
 		System.out.println("Scrape result successfully written to: " + file.toURI());
 	}
 
-	private String buildMarkdownFromLink(ScrapeData data) {
+	private String buildMarkdownFromLink(Link data) {
 		StringBuilder markdownLink = new StringBuilder();
 		String URL = data.getURL();
 		int URLDepth = data.getURLDepth();
@@ -42,7 +44,6 @@ public class MarkdownWriter {
 		appendLinkIndentation(markdownLink, URLDepth);
 		appendLinkIsBrokenURL(markdownLink, isBrokenURL);
 		appendURL(markdownLink, URL);
-		writeEmptyLine();
 
 		return markdownLink.toString();
 	}
@@ -52,12 +53,14 @@ public class MarkdownWriter {
 		for (int i = 0; i < URLDepth; i++) {
 			markdownLink.append("--");
 		}
-		markdownLink.append("> ");
+		if (URLDepth != 0) {
+			markdownLink.append("> ");
+		}
 	}
 
 	private void appendLinkIsBrokenURL(StringBuilder markdownLink, boolean isBrokenURL) {
 		if (isBrokenURL) {
-			markdownLink.append("broken link");
+			markdownLink.append("broken link ");
 		} else {
 			markdownLink.append("link to ");
 		}
@@ -96,9 +99,11 @@ public class MarkdownWriter {
 		markdownHeader.append(numerator);
 	}
 
-	private void writeEmptyLine() {
+	private void writeNewLine(int amount) {
 		try {
-			fileWriter.write("\n\n");
+			for (int i = 0; i < amount; i++) {
+				fileWriter.write(System.lineSeparator());
+			}
 		} catch (IOException ioException) {
 			System.err.println("Error writing empty-line in file.");
 			ioException.printStackTrace();
@@ -106,7 +111,9 @@ public class MarkdownWriter {
 	}
 
 	public void closeFile() throws IOException {
-		fileWriter.close();
+		if (file.exists()) {
+			fileWriter.close();
+		}
 	}
 
 }
