@@ -3,8 +3,7 @@ import java.util.ArrayList;
 
 public class WebScraper {
 
-    private Language targetLanguage;
-    private int searchDepth;
+    private WebScraperInfo info;
     private File file;
     private MarkdownWriter markdownWriter;
     private ArrayList<Link> scrapedData;
@@ -26,7 +25,7 @@ public class WebScraper {
     }
 
     public void scrape() {
-        getLinks(searchDepth);
+        getLinks(info.getSearchDepth());
         getHeaders();
         if (shouldTranslate()) {
             translate();
@@ -51,6 +50,6 @@ public class WebScraper {
     }
 
     private boolean shouldTranslate() {
-        return this.targetLanguage != Language.NONE;
+        return info.getTargetLanguage() != Language.NONE;
     }
 }

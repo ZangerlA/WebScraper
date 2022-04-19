@@ -3,6 +3,8 @@ import org.junit.jupiter.api.Test;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
+import java.time.Month;
 import java.util.ArrayList;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -48,7 +50,8 @@ public class MarkdownWriterTests {
         setupWriter(testFileName);
         markdownWriter.openFile();
         ArrayList<Link> links = createLinks();
-        assertDoesNotThrow(() -> markdownWriter.writeToFile(links));
+        WebScraperInfo info = createWebScraperInfo();
+        assertDoesNotThrow(() -> markdownWriter.writeToFile(links, info));
         markdownWriter.closeFile();
     }
 
@@ -80,5 +83,13 @@ public class MarkdownWriterTests {
         links.add(link3);
 
         return links;
+    }
+
+    private WebScraperInfo createWebScraperInfo() {
+        WebScraperInfo info = new WebScraperInfo("www.testURL1.com", Language.EN, Language.DE, 1);
+        info.setStartTime(LocalDateTime.of(2022, Month.DECEMBER, 24, 20, 00, 00));
+        info.setStartTime(LocalDateTime.of(2022, Month.DECEMBER, 24, 20, 02, 00));
+
+        return info;
     }
 }

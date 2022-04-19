@@ -14,15 +14,17 @@ public class MarkdownWriter {
 
 	public void openFile() throws IOException {
 		boolean appendMode = false;
-		if (this.file.exists()) {
+		if (file.exists()) {
 			appendMode = true;
 		} else {
-			this.file.createNewFile();
+			file.createNewFile();
 		}
 		fileWriter = new FileWriter(this.file, appendMode);
 	}
 
-	public void writeToFile(List<Link> scrapeData) throws IOException {
+	public void writeToFile(List<Link> scrapeData, WebScraperInfo info) throws IOException {
+		fileWriter.write(buildInfoBlock(info));
+		writeNewLine(1);
 		for (Link data : scrapeData) {
 			fileWriter.write(buildMarkdownFromLink(data));
 			writeNewLine(1);
@@ -35,11 +37,24 @@ public class MarkdownWriter {
 		System.out.println("Scrape result successfully written to: " + file.toURI());
 	}
 
-	private String buildMarkdownFromLink(Link data) {
+	private String buildInfoBlock(WebScraperInfo info) {
+		StringBuilder infoBlock = new StringBuilder();
+		infoBlock.append("> INFORMATION:");
+		infoBlock.append("<br>input: " + info.getInitialURL());
+		infoBlock.append("<br>depth: " + info.getSearchDepth());
+		infoBlock.append("<br>source language: " + info.getSourceLanguage());
+		infoBlock.append("<br>target language: " + info.getTargetLanguage());
+		infoBlock.append("<br>start time: " + info.getStartTime());
+		infoBlock.append("<br>end time: " + info.getEndTime());
+
+		return infoBlock.toString();
+	}
+
+	private String buildMarkdownFromLink(Link links) {
 		StringBuilder markdownLink = new StringBuilder();
-		String URL = data.getURL();
-		int URLDepth = data.getURLDepth();
-		boolean isBrokenURL = data.isBrokenURL();
+		String URL = links.getURL();
+		int URLDepth = links.getURLDepth();
+		boolean isBrokenURL = links.isBrokenURL();
 
 		appendLinkIndentation(markdownLink, URLDepth);
 		appendLinkIsBrokenURL(markdownLink, isBrokenURL);
