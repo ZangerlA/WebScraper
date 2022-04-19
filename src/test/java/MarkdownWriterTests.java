@@ -74,10 +74,10 @@ public class MarkdownWriterTests {
         link1.setBrokenURL(false);
         link2.setBrokenURL(false);
         link3.setBrokenURL(true);
-        link1.addHeader(new Header("link1test1", 1));
-        link1.addHeader(new Header("link1test2", 2));
-        link2.addHeader(new Header("link2test1", 1));
-        link2.addHeader(new Header("link2test2", 1));
+        link1.addHeader(new Header("link1test1", 1, 1));
+        link1.addHeader(new Header("link1test2", 2, 1));
+        link2.addHeader(new Header("link2test1", 1, 1));
+        link2.addHeader(new Header("link2test2", 1, 1));
         links.add(link1);
         links.add(link2);
         links.add(link3);
@@ -86,7 +86,11 @@ public class MarkdownWriterTests {
     }
 
     private WebScraperInfo createWebScraperInfo() {
-        WebScraperInfo info = new WebScraperInfo("www.testURL1.com", Language.EN, Language.DE, 1);
+        WebScraperInfo info = new WebScraperInfo();
+        info.setInitialURL("www.testURL1.com");
+        info.setSourceLanguage(Language.EN);
+        info.setTargetLanguage(Language.DE);
+        info.setSearchDepth(1);
         info.setStartTime(LocalDateTime.of(2022, Month.DECEMBER, 24, 20, 00, 00));
         info.setStartTime(LocalDateTime.of(2022, Month.DECEMBER, 24, 20, 02, 00));
 

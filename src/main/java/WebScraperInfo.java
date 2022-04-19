@@ -10,27 +10,39 @@ public class WebScraperInfo {
 	private String startTime;
 	private String endTime;
 
-	public WebScraperInfo(String initialURL, Language sourceLanguage, Language targetLanguage, int searchDepth) {
-		this.initialURL = initialURL;
-		this.sourceLanguage = sourceLanguage;
-		this.targetLanguage = targetLanguage;
-		this.searchDepth = searchDepth;
+	public WebScraperInfo() {
 	}
 
 	public String getInitialURL() {
 		return initialURL;
 	}
 
+	public void setInitialURL(String initialURL) {
+		this.initialURL = initialURL;
+	}
+
 	public Language getSourceLanguage() {
 		return sourceLanguage;
+	}
+
+	public void setSourceLanguage(Language sourceLanguage) {
+		this.sourceLanguage = sourceLanguage;
 	}
 
 	public Language getTargetLanguage() {
 		return targetLanguage;
 	}
 
+	public void setTargetLanguage(Language targetLanguage) {
+		this.targetLanguage = targetLanguage;
+	}
+
 	public int getSearchDepth() {
 		return searchDepth;
+	}
+
+	public void setSearchDepth(int searchDepth) {
+		this.searchDepth = searchDepth;
 	}
 
 	public String getStartTime() {

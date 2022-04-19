@@ -15,8 +15,8 @@ public class WebScraper {
     private ArrayList<Link> links;
 
     public WebScraper(String url, int searchDepth) {
-        this.startURL = url;
-        this.searchDepth = searchDepth;
+        info.setInitialURL(url);
+        info.setSearchDepth(searchDepth);
         links = new ArrayList<>();
     }
 
