@@ -83,10 +83,8 @@ public class WebScraper {
             System.out.println("NEW LINK !!!!!!!!!");
             try {
                 Document document = Jsoup.connect(scrapeData.getURL()).get();
-
                 Elements headerElements = document.select("h1, h2, h3, h4, h5, h6");
 
-                System.out.println(headerElements.size());
                 int[] levelCounter = {0,0,0,0,0,0}; //counter vor every headerlvl
                 int lastLevel = 0; // last level
                 int highestLevel = 0;
@@ -122,13 +120,13 @@ public class WebScraper {
 
                         System.out.println(newHeader.getHeaderLevelString());
                     }
-                    else if (lastLevel > headerLVL){
+                    else if (lastLevel >= headerLVL){
                         for (int i = headerLVL; i < 6; i++) {
                             if (levelCounter[headerLVL] != 0){
                                 levelCounter[headerLVL] = 1;
                             }
                         }
-                        levelCounter[lastLevel - 1] += 1;
+                        levelCounter[headerLVL - 1] += 1;
                         Header newHeader = new Header(header.text(), headerLVL, getHeaderLevelString(levelCounter));
                         scrapeData.addHeader(newHeader);
                         lastLevel = headerLVL;
