@@ -101,31 +101,34 @@ public class WebScraper {
 
                     if (headerLVL == highestLevel || highestLevel == 0){
                         levelCounter[headerLVL - 1] = levelCounter[headerLVL - 1] + 1;
-                        for (int i = headerLVL - 1; i < levelCounter.length; i++) {
-                            if (levelCounter[headerLVL] != 0){
-                                levelCounter[headerLVL] = 1;
+                        for (int i = headerLVL; i < levelCounter.length; i++) {
+                            if (levelCounter[i] != 0){
+                                levelCounter[i] = 1;
                             }
                         }
                         Header newHeader = new Header(header.text(), headerLVL, getHeaderLevelString(levelCounter));
                         scrapeData.addHeader(newHeader);
                         lastLevel = headerLVL;
+                        System.out.println("headerLVL == highestLevel");
                     }
                     else if (levelCounter[headerLVL - 1] == headerLVL || lastLevel < headerLVL){
                         levelCounter[headerLVL - 1] += 1;
                         Header newHeader = new Header(header.text(), headerLVL, getHeaderLevelString(levelCounter));
                         scrapeData.addHeader(newHeader);
                         lastLevel = headerLVL;
+                        System.out.println("lastLevel < headerLVL");
                     }
                     else if (lastLevel >= headerLVL){
-                        for (int i = headerLVL - 1; i < levelCounter.length; i++) {
-                            if (levelCounter[headerLVL] != 0){
-                                levelCounter[headerLVL] = 1;
+                        for (int i = headerLVL; i < levelCounter.length; i++) {
+                            if (levelCounter[i] != 0){
+                                levelCounter[i] = 1;
                             }
                         }
                         levelCounter[headerLVL - 1] += 1;
                         Header newHeader = new Header(header.text(), headerLVL, getHeaderLevelString(levelCounter));
                         scrapeData.addHeader(newHeader);
                         lastLevel = headerLVL;
+                        System.out.println("lastLevel >= headerLVL");
                     }
 
                     System.out.println("Header Attribute: " + levelCounter[0] + ", "+ levelCounter[1] + ", "+ levelCounter[2] + ", "+ levelCounter[3] + ", "+ levelCounter[4] + ", " + levelCounter[5]);
