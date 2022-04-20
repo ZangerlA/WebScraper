@@ -37,6 +37,13 @@ public class WebScraperInfo {
 		this.targetLanguage = targetLanguage;
 	}
 
+	public boolean shouldTranslate() {
+		if (targetLanguage == Language.NONE) {
+			return false;
+		}
+		return true;
+	}
+
 	public int getSearchDepth() {
 		return searchDepth;
 	}

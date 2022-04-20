@@ -56,6 +56,12 @@ public class MarkdownWriterTests {
     }
 
     @Test
+    void WhenWritingToFileWithoutOpeningFileThenShouldThrow() throws IOException {
+        setupWriter(testFileName);
+        assertThrows(IOException.class, () -> markdownWriter.writeToFile(standardTestLinks, standardTestInfo));
+    }
+
+    @Test
     void WhenWritingValidLinksThenWriterShouldNotThrow() {
         assertDoesNotThrow(() -> writeTestFile());
     }
@@ -69,6 +75,24 @@ public class MarkdownWriterTests {
         long mismatch = Files.mismatch(comparisonFilePath, file.toPath());
 
         assertEquals(-1, mismatch);
+    }
+
+    @Test
+    void WhenWritingFileAndLinksAreNullThenShouldThrow() throws IOException {
+        openTestFile();
+        assertThrows(NullPointerException.class, () -> markdownWriter.writeToFile(null, standardTestInfo));
+    }
+
+    @Test
+    void WhenWritingFileAndWebScraperInfoIsNullThenShouldThrow() throws IOException {
+        openTestFile();
+        assertThrows(NullPointerException.class, () -> markdownWriter.writeToFile(standardTestLinks, null));
+    }
+
+    @Test
+    void WhenClosingFileWithoutOpeningThenShouldNotThrow() {
+        setupWriter(testFileName);
+        assertDoesNotThrow(() -> markdownWriter.closeFile());
     }
 
     private void writeTestFile() throws IOException {
