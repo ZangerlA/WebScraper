@@ -6,6 +6,7 @@ import org.jsoup.select.Elements;
 import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.logging.Level;
 
 public class WebScraper {
 
@@ -15,6 +16,7 @@ public class WebScraper {
     private ArrayList<Link> links;
 
     public WebScraper(String url, int searchDepth) {
+        this.info = new WebScraperInfo();
         info.setInitialURL(url);
         info.setSearchDepth(searchDepth);
         links = new ArrayList<>();
@@ -78,42 +80,87 @@ public class WebScraper {
 
     private void getHeaders() {
         for (Link scrapeData: links) {
+            System.out.println("NEW LINK !!!!!!!!!");
             try {
                 Document document = Jsoup.connect(scrapeData.getURL()).get();
 
-                Elements headerElements = document.select("h0, h1, h2, h3, h4, h5, h6");
+                Elements headerElements = document.select("h1, h2, h3, h4, h5, h6");
 
                 System.out.println(headerElements.size());
-
-                int headerLevelCounter = 1;
-                int[] levelCounter = {1,1,1,1,1,1,1}; //counter vor every headerlvl
+                int[] levelCounter = {0,0,0,0,0,0}; //counter vor every headerlvl
                 int lastLevel = 0; // last level
+                int highestLevel = 0;
 
                 for (Element header: headerElements) {
                     int headerLVL = Integer.parseInt(header.tagName().substring(header.tagName().length() - 1));
-                    System.out.println("Header Attribute: " + levelCounter[0] + ", "+ levelCounter[1] + ", "+ levelCounter[2] + ", "+ levelCounter[3] + ", "+ levelCounter[4] + ", " + levelCounter[5] + ", "+ levelCounter[6]);
 
-                    if (levelCounter[headerLVL] == headerLVL || lastLevel < headerLVL){
-                        System.out.println("counter up");
-                        levelCounter[headerLVL]++;
-                        Header newHeader = new Header(header.text(), headerLVL, levelCounter[headerLVL]);
+                    for (int i = 0; i < 6; i++) {
+                        if (levelCounter[i] != 0) {
+                            highestLevel = i + 1;
+                            break;
+                        }
+                    }
+
+                    if (headerLVL == highestLevel || highestLevel == 0){
+                        levelCounter[headerLVL - 1] = levelCounter[headerLVL - 1] + 1;
+                        for (int i = headerLVL; i < 6; i++) {
+                            if (levelCounter[headerLVL] != 0){
+                                levelCounter[headerLVL] = 1;
+                            }
+                        }
+                        Header newHeader = new Header(header.text(), headerLVL, getHeaderLevelString(levelCounter));
                         scrapeData.addHeader(newHeader);
                         lastLevel = headerLVL;
+
+                        System.out.println(newHeader.getHeaderLevelString());
+                    }
+                    else if (levelCounter[headerLVL - 1] == headerLVL || lastLevel < headerLVL){
+                        levelCounter[headerLVL - 1] += 1;
+                        Header newHeader = new Header(header.text(), headerLVL, getHeaderLevelString(levelCounter));
+                        scrapeData.addHeader(newHeader);
+                        lastLevel = headerLVL;
+
+                        System.out.println(newHeader.getHeaderLevelString());
                     }
                     else if (lastLevel > headerLVL){
-                        levelCounter[lastLevel] = 1;
-                        Header newHeader = new Header(header.text(), headerLVL, levelCounter[headerLVL]);
+                        for (int i = headerLVL; i < 6; i++) {
+                            if (levelCounter[headerLVL] != 0){
+                                levelCounter[headerLVL] = 1;
+                            }
+                        }
+                        levelCounter[lastLevel - 1] += 1;
+                        Header newHeader = new Header(header.text(), headerLVL, getHeaderLevelString(levelCounter));
                         scrapeData.addHeader(newHeader);
                         lastLevel = headerLVL;
+
+                        System.out.println(newHeader.getHeaderLevelString());
                     }
 
-                    headerLevelCounter++;
+                    System.out.println("Header Attribute: " + levelCounter[0] + ", "+ levelCounter[1] + ", "+ levelCounter[2] + ", "+ levelCounter[3] + ", "+ levelCounter[4] + ", " + levelCounter[5]);
                 }
 
             } catch (Exception e) {
                 System.err.println("For '" +  "': " + e.getMessage());
             }
         }
+    }
+
+    private String getHeaderLevelString(int[] headerLevels){
+        String headerString = "";
+        for (int i = 0; i < headerLevels.length; i++) {
+            if (headerLevels[i] == 0){
+            }
+            else if (i != headerLevels.length - 1){
+                headerString += headerLevels[i] + ".";
+            }
+            else {
+                headerString += headerLevels[i];
+            }
+        }
+        if (headerString.endsWith(".")){
+            headerString = headerString.substring(0, headerString.length() - 1);
+        }
+        return headerString;
     }
 
     private void translate() {

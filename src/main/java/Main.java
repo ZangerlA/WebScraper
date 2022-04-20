@@ -1,6 +1,6 @@
 public class Main {
     public static void main(String[] args) {
-        WebScraper webScraper = new WebScraper("https://www.hypovereinsbank.de/hvb/privatkunden", 1);
+        WebScraper webScraper = new WebScraper("https://onepiece-tube.com/", 0);
         webScraper.scrape();
     }
 }
