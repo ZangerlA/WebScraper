@@ -71,9 +71,6 @@ public class WebScraper {
             newSD.setURL(link);
             links.add(newSD);
 
-            System.out.println(link);
-            System.out.println("Current Depth:" + currentDepth);
-
             getLinks(link, currentDepth + 1);
         }
     }
