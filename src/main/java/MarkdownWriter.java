@@ -68,7 +68,7 @@ public class MarkdownWriter {
 		infoBlock.append("> INFORMATION:" + newLine);
 		infoBlock.append("<br>input: " + info.getInitialURL() + newLine);
 		infoBlock.append("<br>depth: " + info.getSearchDepth() + newLine);
-		if (!info.shouldTranslate()) {
+		if (info.shouldTranslate()) {
 			infoBlock.append("<br>source language: " + info.getSourceLanguage().toString() + newLine);
 			infoBlock.append("<br>target language: " + info.getTargetLanguage().toString() + newLine);
 		}
