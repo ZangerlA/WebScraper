@@ -22,14 +22,14 @@ public class MarkdownWriter {
 		fileWriter = new FileWriter(this.file, appendMode);
 	}
 
-	public void writeToFile(List<Link> scrapeData, WebScraperInfo info) throws IOException {
+	public void writeToFile(List<Link> links, WebScraperInfo info) throws IOException {
 		fileWriter.write(buildInfoBlock(info));
 		writeNewLine(1);
-		for (Link data : scrapeData) {
-			fileWriter.write(buildMarkdownFromLink(data));
+		for (Link link : links) {
+			fileWriter.write(buildMarkdownForLink(link));
 			writeNewLine(1);
-			for (Header header : data.getHeaders()) {
-				fileWriter.write(buildMarkdownFromHeader(header));
+			for (Header header : link.getHeaders()) {
+				fileWriter.write(buildMarkdownForHeader(header));
 				writeNewLine(1);
 			}
 			writeNewLine(1);
@@ -39,18 +39,19 @@ public class MarkdownWriter {
 
 	private String buildInfoBlock(WebScraperInfo info) {
 		StringBuilder infoBlock = new StringBuilder();
-		infoBlock.append("> INFORMATION:");
-		infoBlock.append("<br>input: " + info.getInitialURL());
-		infoBlock.append("<br>depth: " + info.getSearchDepth());
-		infoBlock.append("<br>source language: " + info.getSourceLanguage());
-		infoBlock.append("<br>target language: " + info.getTargetLanguage());
-		infoBlock.append("<br>start time: " + info.getStartTime());
-		infoBlock.append("<br>end time: " + info.getEndTime());
+		String newLine = getNewLine();
+		infoBlock.append("> INFORMATION:" + newLine);
+		infoBlock.append("<br>input: " + info.getInitialURL() + newLine);
+		infoBlock.append("<br>depth: " + info.getSearchDepth() + newLine);
+		infoBlock.append("<br>source language: " + info.getSourceLanguage().toString() + newLine);
+		infoBlock.append("<br>target language: " + info.getTargetLanguage().toString() + newLine);
+		infoBlock.append("<br>start time: " + info.getStartTime() + newLine);
+		infoBlock.append("<br>end time: " + info.getEndTime() + newLine);
 
 		return infoBlock.toString();
 	}
 
-	private String buildMarkdownFromLink(Link links) {
+	private String buildMarkdownForLink(Link links) {
 		StringBuilder markdownLink = new StringBuilder();
 		String URL = links.getURL();
 		int URLDepth = links.getURLDepth();
@@ -87,13 +88,15 @@ public class MarkdownWriter {
 		markdownLink.append("</a>");
 	}
 
-	private String buildMarkdownFromHeader(Header header) {
+	private String buildMarkdownForHeader(Header header) {
 		StringBuilder markdownHeader = new StringBuilder();
 		String headerText = header.getHeader();
 		int headerLevel = header.getHeaderLevel();
+		String headerNumerator = header.getHeaderLevelString();
 
 		appendHeaderIndentation(markdownHeader, headerLevel);
 		appendHeader(markdownHeader, headerText);
+		appendHeaderNumerator(markdownHeader, headerNumerator);
 
 		return markdownHeader.toString();
 	}
@@ -111,7 +114,7 @@ public class MarkdownWriter {
 	}
 
 	private void appendHeaderNumerator(StringBuilder markdownHeader, String numerator) {
-		markdownHeader.append(numerator);
+		markdownHeader.append(" " + numerator);
 	}
 
 	private void writeNewLine(int amount) {
@@ -123,6 +126,10 @@ public class MarkdownWriter {
 			System.err.println("Error writing empty-line in file.");
 			ioException.printStackTrace();
 		}
+	}
+
+	private String getNewLine() {
+		return System.lineSeparator();
 	}
 
 	public void closeFile() throws IOException {
