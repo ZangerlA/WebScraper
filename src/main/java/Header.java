@@ -1,30 +1,28 @@
-import java.util.stream.Stream;
-
 public class Header {
-    private String header;
-    private int headerLevel;
+    private String content;
+    private int level;
     private String headerLevelString;
 
     public Header(String header, int headerLevel, String numInLevel) {
-        this.header = header;
-        this.headerLevel = headerLevel;
+        this.content = header;
+        this.level = headerLevel;
         this.headerLevelString = numInLevel;
     }
 
-    public String getHeader() {
-        return header;
+    public String getContent() {
+        return content;
     }
 
-    public void setHeader(String header) {
-        this.header = header;
+    public void setContent(String content) {
+        this.content = content;
     }
 
-    public int getHeaderLevel() {
-        return headerLevel;
+    public int getLevel() {
+        return level;
     }
 
-    public void setHeaderLevel(int headerLevel) {
-        this.headerLevel = headerLevel;
+    public void setLevel(int level) {
+        this.level = level;
     }
 
     public String  getHeaderLevelString() {

@@ -93,8 +93,8 @@ public class MarkdownWriter {
 
 	private String buildMarkdownForHeader(Header header) {
 		StringBuilder markdownHeader = new StringBuilder();
-		String headerText = header.getHeader();
-		int headerLevel = header.getHeaderLevel();
+		String headerText = header.getContent();
+		int headerLevel = header.getLevel();
 		String headerNumerator = header.getHeaderLevelString();
 
 		appendHeaderIndentation(markdownHeader, headerLevel);
