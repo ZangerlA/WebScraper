@@ -12,14 +12,15 @@ public class MarkdownWriter {
 		markdownFile = file;
 	}
 
-	public static MarkdownWriter getMarkdownWriterFor(File file) throws IOException {
+	public static void write(File file, List<Link> links, WebScraperInfo info) throws IOException {
 		MarkdownWriter writer = new MarkdownWriter(file);
 		writer.openFile();
-		return writer;
+		writer.writeToFile(links, info);
+		writer.closeFile();
 	}
 
 	private void openFile() throws IOException {
-		boolean shouldAppend = markdownFile.createNewFile();
+		boolean shouldAppend = !markdownFile.createNewFile();
 		fileWriter = new FileWriter(markdownFile, shouldAppend);
 	}
 
@@ -152,7 +153,7 @@ public class MarkdownWriter {
 		return System.lineSeparator();
 	}
 
-	public void closeFile() throws IOException {
+	private void closeFile() throws IOException {
 		if (markdownFile.exists()) {
 			fileWriter.close();
 		}
