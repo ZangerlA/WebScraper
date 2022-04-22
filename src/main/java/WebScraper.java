@@ -5,6 +5,7 @@ import org.jsoup.select.Elements;
 
 import java.io.File;
 import java.io.IOException;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.logging.Level;
 
@@ -19,7 +20,11 @@ public class WebScraper {
         this.info = new WebScraperInfo();
         info.setInitialURL(url);
         info.setSearchDepth(searchDepth);
+        info.setSourceLanguage(Language.NONE);
+        info.setTargetLanguage(Language.NONE);
         links = new ArrayList<>();
+        this.file = new File("default.md");
+        this.markdownWriter = new MarkdownWriter(file);
     }
 
     public WebScraper(String url, String outputFileName) {
@@ -35,30 +40,36 @@ public class WebScraper {
     }
 
     public void scrape() {
+        info.setStartTime(LocalDateTime.now());
         getLinks(info.getInitialURL(), 0);
         getHeaders();
         if (shouldTranslate()) {
             translate();
         }
+        info.setEndTime(LocalDateTime.now());
         writeToFile();
     }
 
     private void getLinks(String url, int currentDepth) {
         if (url != "" && currentDepth <= info.getSearchDepth()) {
+            String lastLink = "";
             try {
                 Document document = Jsoup.connect(url).get();
                 Elements linksOnPage = document.select("a[href]");
 
                 for (Element link : linksOnPage) {
-                    checkDuplicateLinks(link.attr("abs:href"), currentDepth);
+                    lastLink = link.attr("abs:href");
+                    checkDuplicateLinks(lastLink, currentDepth);
                 }
 
             } catch (IOException e) {
-                System.err.println("For '" + url + "': " + e.getMessage());
+                System.err.println("ForUrl broken: '" + url + "'");
+                Link errorLink = new Link();
+                errorLink.setURL(lastLink);
+                errorLink.setBrokenURL(true);
             }
         }
     }
-
     private void checkDuplicateLinks(String link, int currentDepth){
         boolean alreadyCrawled = false;
         for (Link scrapData: links) {
@@ -124,9 +135,9 @@ public class WebScraper {
                         lastLevel = headerLVL;
                     }
                 }
-
             } catch (Exception e) {
-                System.err.println("For '" +  "': " + e.getMessage());
+                System.err.println("Headers: " + e.getMessage());
+                scrapeData.setBrokenURL(true);
             }
         }
     }
@@ -155,6 +166,13 @@ public class WebScraper {
 
     private void writeToFile() {
         //TODO
+        try{
+            markdownWriter.openFile();
+            markdownWriter.writeToFile(links, info);
+            markdownWriter.closeFile();
+        }catch (Exception e){
+            System.out.println("Couldn´t write to File!" + e.getMessage());
+        }
     }
 
     private boolean shouldTranslate() {

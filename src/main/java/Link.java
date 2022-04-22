@@ -3,7 +3,6 @@ import java.util.ArrayList;
 public class Link {
 	private String URL;
 	private int URLDepth;
-
 	private boolean isBrokenURL;
 	private final ArrayList<Header> headers;
 
