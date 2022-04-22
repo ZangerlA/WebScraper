@@ -34,25 +34,24 @@ public class MarkdownWriterTests {
 
     @Test
     void WhenOpenFileIsCalledThenFileShouldExist() throws IOException {
-        openTestFile();
+        setupWriter(testFileName);
         assertTrue(file.exists());
     }
 
     @Test
-    void WhenFileNameNotValidThenExceptionShouldBeThrown() {
-        setupWriter("///.");
-        assertThrows(IOException.class, () -> markdownWriter.openFile());
+    void WhenFileNameNotValidThenExceptionShouldBeThrown() throws IOException {
+        assertThrows(IOException.class, () -> setupWriter("///."));
     }
 
     @Test
     void WhenFileAlreadyExistsThenItShouldNotBeOverwritten() throws IOException {
-        openTestFile();
+        setupWriter(testFileName);
         long lastModifiedBefore = file.lastModified();
         markdownWriter.closeFile();
-        openTestFile();
+        setupWriter(testFileName);
         long lastModifiedAfter = file.lastModified();
 
-        assertTrue(lastModifiedBefore == lastModifiedAfter);
+        assertEquals(lastModifiedBefore, lastModifiedAfter);
     }
 
     @Test
@@ -79,35 +78,24 @@ public class MarkdownWriterTests {
 
     @Test
     void WhenWritingFileAndLinksAreNullThenShouldThrow() throws IOException {
-        openTestFile();
+        setupWriter(testFileName);
         assertThrows(NullPointerException.class, () -> markdownWriter.writeToFile(null, standardTestInfo));
     }
 
     @Test
     void WhenWritingFileAndWebScraperInfoIsNullThenShouldThrow() throws IOException {
-        openTestFile();
+        setupWriter(testFileName);
         assertThrows(NullPointerException.class, () -> markdownWriter.writeToFile(standardTestLinks, null));
     }
 
-    @Test
-    void WhenClosingFileWithoutOpeningThenShouldNotThrow() {
-        setupWriter(testFileName);
-        assertDoesNotThrow(() -> markdownWriter.closeFile());
-    }
-
     private void writeTestFile() throws IOException {
-        openTestFile();
+        setupWriter(testFileName);
         markdownWriter.writeToFile(standardTestLinks, standardTestInfo);
     }
 
-    private void setupWriter(String fileName) {
+    private void setupWriter(String fileName) throws IOException {
         file = new File(fileName);
-        markdownWriter = new MarkdownWriter(file);
-    }
-
-    private void openTestFile() throws IOException {
-        setupWriter(testFileName);
-        markdownWriter.openFile();
+        markdownWriter = MarkdownWriter.getMarkdownWriterFor(file);
     }
 
     private static ArrayList<Link> createLinks() {
