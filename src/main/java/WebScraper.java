@@ -62,37 +62,37 @@ public class WebScraper {
 
     private void getLinks(String url, int currentDepth) {
         if (url != "" && currentDepth <= info.getSearchDepth()) {
-            String lastLink = "";
+            String linkUrl = "";
             try {
                 Document document = Jsoup.connect(url).get();
-                Elements linksOnPage = document.select("a[href]");
+                Elements documentLinks = document.select("a[href]");
 
-                for (Element link : linksOnPage) {
-                    lastLink = link.attr("abs:href");
-                    checkDuplicateLinks(lastLink, currentDepth);
+                for (Element link : documentLinks) {
+                    linkUrl = link.attr("abs:href");
+                    addLink(linkUrl, currentDepth);
                 }
 
             } catch (IOException e) {
-                System.err.println("ForUrl broken: '" + url + "'");
+                System.err.println("broken URL: '" + url + "'");
                 Link errorLink = new Link();
-                errorLink.setURL(lastLink);
+                errorLink.setURL(linkUrl);
                 errorLink.setBrokenURL(true);
             }
         }
     }
-    private void checkDuplicateLinks(String link, int currentDepth){
+    private void addLink(String linkUrl, int currentDepth){
         boolean alreadyCrawled = false;
-        for (Link scrapData: links) {
-            if (link.equals(scrapData.getURL())){
+        for (Link link: links) {
+            if (linkUrl.equals(link.getURL())){
                 alreadyCrawled = true;
             }
         }
         if (alreadyCrawled == false){
-            Link newSD = new Link();
-            newSD.setURL(link);
-            links.add(newSD);
+            Link link = new Link();
+            link.setURL(linkUrl);
+            links.add(link);
 
-            getLinks(link, currentDepth + 1);
+            getLinks(linkUrl, currentDepth + 1);
         }
     }
 
@@ -102,13 +102,15 @@ public class WebScraper {
                 Document document = Jsoup.connect(scrapeData.getURL()).get();
                 Elements headerElements = document.select("h1, h2, h3, h4, h5, h6");
 
-                int[] levelCounter = {0,0,0,0,0,0}; //counter vor every headerlvl
-                int lastLevel = 0; // last level
+                //headelevelcounter
+                int[] levelCounter = {0,0,0,0,0,0};
+                int lastLevel = 0;
                 int highestLevel = 0;
 
-                for (Element header: headerElements) {
-                    int headerLVL = Integer.parseInt(header.tagName().substring(header.tagName().length() - 1));
+                for (Element headerElement: headerElements) {
+                    int headerLevel = Integer.parseInt(headerElement.tagName().substring(headerElement.tagName().length() - 1));
 
+                    // headerlevelcounter.sethighestLevel
                     for (int i = 0; i < 6; i++) {
                         if (levelCounter[i] != 0) {
                             highestLevel = i + 1;
@@ -116,33 +118,37 @@ public class WebScraper {
                         }
                     }
 
-                    if (headerLVL == highestLevel || highestLevel == 0){
-                        levelCounter[headerLVL - 1] = levelCounter[headerLVL - 1] + 1;
-                        for (int i = headerLVL; i < levelCounter.length; i++) {
+                    if (headerLevel == highestLevel || highestLevel == 0){
+                        levelCounter[headerLevel - 1] = levelCounter[headerLevel - 1] + 1;1
+
+                        //headerlevelcounter.clearhigherLevels
+                        for (int i = headerLevel; i < levelCounter.length; i++) {
                             if (levelCounter[i] != 0){
                                 levelCounter[i] = 1;
                             }
                         }
-                        Header newHeader = new Header(header.text(), headerLVL, getHeaderLevelString(levelCounter));
+
+                        Header newHeader = new Header(headerElement.text(), headerLevel, getHeaderLevelString(levelCounter));
                         scrapeData.addHeader(newHeader);
-                        lastLevel = headerLVL;
+                        lastLevel = headerLevel;
                     }
-                    else if (levelCounter[headerLVL - 1] == headerLVL || lastLevel < headerLVL){
-                        levelCounter[headerLVL - 1] += 1;
-                        Header newHeader = new Header(header.text(), headerLVL, getHeaderLevelString(levelCounter));
+                    else if (levelCounter[headerLevel - 1] == headerLevel || lastLevel < headerLevel){
+                        levelCounter[headerLevel - 1] += 1;
+                        Header newHeader = new Header(headerElement.text(), headerLevel, getHeaderLevelString(levelCounter));
                         scrapeData.addHeader(newHeader);
-                        lastLevel = headerLVL;
+                        lastLevel = headerLevel;
                     }
-                    else if (lastLevel >= headerLVL){
-                        for (int i = headerLVL; i < levelCounter.length; i++) {
+                    else if (lastLevel >= headerLevel){
+                        //headerlevelcounter.clearhigherLevels
+                        for (int i = headerLevel; i < levelCounter.length; i++) {
                             if (levelCounter[i] != 0){
                                 levelCounter[i] = 1;
                             }
                         }
-                        levelCounter[headerLVL - 1] += 1;
-                        Header newHeader = new Header(header.text(), headerLVL, getHeaderLevelString(levelCounter));
+                        levelCounter[headerLevel - 1] += 1;
+                        Header newHeader = new Header(headerElement.text(), headerLevel, getHeaderLevelString(levelCounter));
                         scrapeData.addHeader(newHeader);
-                        lastLevel = headerLVL;
+                        lastLevel = headerLevel;
                     }
                 }
             } catch (Exception e) {
@@ -155,13 +161,13 @@ public class WebScraper {
     private String getHeaderLevelString(int[] headerLevels){
         String headerString = "";
         for (int i = 0; i < headerLevels.length; i++) {
-            if (headerLevels[i] == 0){
-            }
-            else if (i != headerLevels.length - 1){
-                headerString += headerLevels[i] + ".";
-            }
-            else {
-                headerString += headerLevels[i];
+            if (headerLevels[i] != 0){
+                if (i != headerLevels.length - 1){
+                    headerString += headerLevels[i] + ".";
+                }
+                else {
+                    headerString += headerLevels[i];
+                }
             }
         }
         if (headerString.endsWith(".")){
@@ -175,13 +181,12 @@ public class WebScraper {
     }
 
     private void writeToFile() {
-        //TODO
         try{
             markdownWriter.openFile();
             markdownWriter.writeToFile(links, info);
             markdownWriter.closeFile();
         }catch (Exception e){
-            System.out.println("Couldn´t write to File!" + e.getMessage());
+            System.out.println("Couldn´t write to File: " + e.getMessage());
         }
     }
 
