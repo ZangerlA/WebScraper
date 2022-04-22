@@ -18,25 +18,35 @@ public class WebScraper {
 
     public WebScraper(String url, int searchDepth) {
         this.info = new WebScraperInfo();
-        info.setInitialURL(url);
-        info.setSearchDepth(searchDepth);
-        info.setSourceLanguage(Language.NONE);
-        info.setTargetLanguage(Language.NONE);
-        links = new ArrayList<>();
+        this.info.setInitialURL(url);
+        this.info.setSearchDepth(searchDepth);
+        this.info.setSourceLanguage(Language.NONE);
+        this.info.setTargetLanguage(Language.NONE);
+        this.links = new ArrayList<>();
         this.file = new File("default.md");
         this.markdownWriter = new MarkdownWriter(file);
     }
 
-    public WebScraper(String url, String outputFileName) {
-        //TODO
-    }
-
-    public WebScraper(String url, Language targetLanguage, String outputFileName) {
-        //TODO
+    public WebScraper(String url, String outputFileName, int searchDepth) {
+        this.info = new WebScraperInfo();
+        this.info.setInitialURL(url);
+        this.info.setSearchDepth(searchDepth);
+        this.info.setSourceLanguage(Language.NONE);
+        this.info.setTargetLanguage(Language.NONE);
+        this.links = new ArrayList<>();
+        this.file = new File(outputFileName);
+        this.markdownWriter = new MarkdownWriter(file);
     }
 
     public WebScraper(String url, Language targetLanguage, String outputFileName, int searchDepth) {
-        //TODO
+        this.info = new WebScraperInfo();
+        this.info.setInitialURL(url);
+        this.info.setSearchDepth(searchDepth);
+        this.info.setSourceLanguage(Language.NONE);
+        this.info.setTargetLanguage(targetLanguage);
+        this.links = new ArrayList<>();
+        this.file = new File(outputFileName);
+        this.markdownWriter = new MarkdownWriter(file);
     }
 
     public void scrape() {
