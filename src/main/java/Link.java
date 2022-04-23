@@ -4,7 +4,7 @@ public class Link {
 	private String URL;
 	private int URLDepth;
 	private boolean isBrokenURL;
-	private final ArrayList<Header> headers;
+	private ArrayList<Header> headers;
 
 	public Link() {
 		headers = new ArrayList<>();
@@ -27,13 +27,12 @@ public class Link {
 	}
 
 	public ArrayList<Header> getHeaders() {
-		ArrayList<Header> headersCopy = new ArrayList<>();
-		for (Header header : this.headers) {
-			headersCopy.add(header);
-		}
-		return headersCopy;
+		return new ArrayList<>(this.headers);
 	}
 
+	public void setHeaders(ArrayList<Header> headers) {
+		this.headers = new ArrayList<>(headers);
+	}
 	public boolean isBrokenURL() {
 		return isBrokenURL;
 	}
