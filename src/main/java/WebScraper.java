@@ -6,6 +6,8 @@ import org.jsoup.select.Elements;
 import java.io.File;
 import java.io.IOException;
 import java.net.URL;
+import java.io.UncheckedIOException;
+
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -24,7 +26,6 @@ public class WebScraper {
         this.info.setTargetLanguage(Language.NONE);
         this.links = new ArrayList<>();
         this.file = new File("default.md");
-        this.markdownWriter = new MarkdownWriter(file);
     }
 
     public WebScraper(String url, String outputFileName, int searchDepth) {
@@ -53,7 +54,7 @@ public class WebScraper {
         info.setStartTime(LocalDateTime.now());
         getLinks(info.getInitialURL(), 0);
         loadHeaders();
-        if (shouldTranslate()) {
+        if (info.shouldTranslate()) {
             translate();
         }
         info.setEndTime(LocalDateTime.now());
@@ -140,15 +141,9 @@ public class WebScraper {
 
     private void writeToFile() {
         try{
-            markdownWriter.openFile();
-            markdownWriter.writeToFile(links, info);
-            markdownWriter.closeFile();
-        }catch (Exception e){
-            System.out.println("Couldn´t write to File: " + e.getMessage());
+            MarkdownWriter.write(file, links, info);
+        }catch (IOException ioException){
+            throw new UncheckedIOException(ioException);
         }
-    }
-
-    private boolean shouldTranslate() {
-        return info.getTargetLanguage() != Language.NONE;
     }
 }

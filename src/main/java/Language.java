@@ -1,3 +1,5 @@
+import java.util.Locale;
+
 public enum Language {
     DE,
     EN,
@@ -11,5 +13,13 @@ public enum Language {
     RU,
     JA,
     ZH,
-    NONE
+    NONE;
+
+    public String toISO639_1() {
+        return this == NONE ? throwException() : toString().toLowerCase();
+    }
+
+    private static String throwException() {
+        throw new RuntimeException("Not an ISO Standard.");
+    }
 }

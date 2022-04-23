@@ -15,7 +15,6 @@ import static org.junit.jupiter.api.Assertions.*;
 public class MarkdownWriterTests {
 
     File file;
-    MarkdownWriter markdownWriter;
     static ArrayList<Link> standardTestLinks;
     static WebScraperInfo standardTestInfo;
     final String testFileName = "test.md";
@@ -28,86 +27,52 @@ public class MarkdownWriterTests {
 
     @AfterEach
     void deleteFile() throws IOException {
-        markdownWriter.closeFile();
         file.delete();
     }
 
     @Test
-    void WhenOpenFileIsCalledThenFileShouldExist() throws IOException {
-        openTestFile();
+    void WhenWritingFileThenFileShouldExist() throws IOException {
+        writeTestFile();
         assertTrue(file.exists());
     }
 
     @Test
-    void WhenFileNameNotValidThenExceptionShouldBeThrown() {
-        setupWriter("///.");
-        assertThrows(IOException.class, () -> markdownWriter.openFile());
+    void WhenFileNameNotValidThenExceptionShouldBeThrown() throws IOException {
+        createFile("///.");
+        assertThrows(IOException.class, () -> MarkdownWriter.write(file, standardTestLinks, standardTestInfo));
     }
 
     @Test
     void WhenFileAlreadyExistsThenItShouldNotBeOverwritten() throws IOException {
-        openTestFile();
-        long lastModifiedBefore = file.lastModified();
-        markdownWriter.closeFile();
-        openTestFile();
-        long lastModifiedAfter = file.lastModified();
+        writeTestFile();
+        long previousLength = file.length();
+        writeTestFile();
+        long length = file.length();
 
-        assertTrue(lastModifiedBefore == lastModifiedAfter);
-    }
-
-    @Test
-    void WhenWritingToFileWithoutOpeningFileThenShouldThrow() throws IOException {
-        setupWriter(testFileName);
-        assertThrows(IOException.class, () -> markdownWriter.writeToFile(standardTestLinks, standardTestInfo));
+        assertEquals(previousLength * 2, length);
     }
 
     @Test
     void WhenWritingValidLinksThenWriterShouldNotThrow() {
-        assertDoesNotThrow(() -> writeTestFile());
+        assertDoesNotThrow(this::writeTestFile);
     }
 
     @Test
     void WhenWritingValidLinksThenItShouldMatchComparisonFile() throws IOException {
         writeTestFile();
-        markdownWriter.closeFile();
-
         Path comparisonFilePath = getComparisonFile();
         long mismatch = Files.mismatch(comparisonFilePath, file.toPath());
 
         assertEquals(-1, mismatch);
     }
 
-    @Test
-    void WhenWritingFileAndLinksAreNullThenShouldThrow() throws IOException {
-        openTestFile();
-        assertThrows(NullPointerException.class, () -> markdownWriter.writeToFile(null, standardTestInfo));
-    }
-
-    @Test
-    void WhenWritingFileAndWebScraperInfoIsNullThenShouldThrow() throws IOException {
-        openTestFile();
-        assertThrows(NullPointerException.class, () -> markdownWriter.writeToFile(standardTestLinks, null));
-    }
-
-    @Test
-    void WhenClosingFileWithoutOpeningThenShouldNotThrow() {
-        setupWriter(testFileName);
-        assertDoesNotThrow(() -> markdownWriter.closeFile());
-    }
-
     private void writeTestFile() throws IOException {
-        openTestFile();
-        markdownWriter.writeToFile(standardTestLinks, standardTestInfo);
+        createFile(testFileName);
+        MarkdownWriter.write(file, standardTestLinks, standardTestInfo);
     }
 
-    private void setupWriter(String fileName) {
-        file = new File(fileName);
-        markdownWriter = new MarkdownWriter(file);
-    }
-
-    private void openTestFile() throws IOException {
-        setupWriter(testFileName);
-        markdownWriter.openFile();
+    private void createFile(String name) {
+        file = new File(name);
     }
 
     private static ArrayList<Link> createLinks() {
