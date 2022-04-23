@@ -1,9 +1,9 @@
 public class Header {
     private String content;
     private int level;
-    private String headerLevelString;
+    private MultiLevelIndex headerLevelString;
 
-    public Header(String header, int headerLevel, String numInLevel) {
+    public Header(String header, int headerLevel, MultiLevelIndex numInLevel) {
         this.content = header;
         this.level = headerLevel;
         this.headerLevelString = numInLevel;
@@ -25,11 +25,15 @@ public class Header {
         this.level = level;
     }
 
-    public String  getHeaderLevelString() {
-        return headerLevelString;
+    public String getHeaderLevelString() {
+        return headerLevelString.toString();
     }
 
-    public void setHeaderLevelString(String headerLevelString) {
+    public MultiLevelIndex getMultilevelIndex(){
+        return this.headerLevelString;
+    }
+
+    public void setHeaderLevelString(MultiLevelIndex headerLevelString) {
         this.headerLevelString = headerLevelString;
     }
 }
