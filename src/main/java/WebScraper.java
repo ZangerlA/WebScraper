@@ -7,7 +7,6 @@ import java.io.File;
 import java.io.IOException;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
-import java.util.logging.Level;
 
 public class WebScraper {
 
@@ -52,7 +51,7 @@ public class WebScraper {
     public void scrape() {
         info.setStartTime(LocalDateTime.now());
         getLinks(info.getInitialURL(), 0);
-        getHeaders();
+        loadHeaders();
         if (shouldTranslate()) {
             translate();
         }
@@ -96,84 +95,35 @@ public class WebScraper {
         }
     }
 
-    private void getHeaders() {
-        for (Link scrapeData: links) {
+    private void loadHeaders() {
+        for (Link link: links) {
             try {
-                Document document = Jsoup.connect(scrapeData.getURL()).get();
-                Elements headerElements = document.select("h1, h2, h3, h4, h5, h6");
-
-                //headelevelcounter
-                int[] levelCounter = {0,0,0,0,0,0};
-                int lastLevel = 0;
-                int highestLevel = 0;
-
-                for (Element headerElement: headerElements) {
-                    int headerLevel = Integer.parseInt(headerElement.tagName().substring(headerElement.tagName().length() - 1));
-
-                    // headerlevelcounter.sethighestLevel
-                    for (int i = 0; i < 6; i++) {
-                        if (levelCounter[i] != 0) {
-                            highestLevel = i + 1;
-                            break;
-                        }
-                    }
-
-                    if (headerLevel == highestLevel || highestLevel == 0){
-                        levelCounter[headerLevel - 1] = levelCounter[headerLevel - 1] + 1;1
-
-                        //headerlevelcounter.clearhigherLevels
-                        for (int i = headerLevel; i < levelCounter.length; i++) {
-                            if (levelCounter[i] != 0){
-                                levelCounter[i] = 1;
-                            }
-                        }
-
-                        Header newHeader = new Header(headerElement.text(), headerLevel, getHeaderLevelString(levelCounter));
-                        scrapeData.addHeader(newHeader);
-                        lastLevel = headerLevel;
-                    }
-                    else if (levelCounter[headerLevel - 1] == headerLevel || lastLevel < headerLevel){
-                        levelCounter[headerLevel - 1] += 1;
-                        Header newHeader = new Header(headerElement.text(), headerLevel, getHeaderLevelString(levelCounter));
-                        scrapeData.addHeader(newHeader);
-                        lastLevel = headerLevel;
-                    }
-                    else if (lastLevel >= headerLevel){
-                        //headerlevelcounter.clearhigherLevels
-                        for (int i = headerLevel; i < levelCounter.length; i++) {
-                            if (levelCounter[i] != 0){
-                                levelCounter[i] = 1;
-                            }
-                        }
-                        levelCounter[headerLevel - 1] += 1;
-                        Header newHeader = new Header(headerElement.text(), headerLevel, getHeaderLevelString(levelCounter));
-                        scrapeData.addHeader(newHeader);
-                        lastLevel = headerLevel;
-                    }
-                }
-            } catch (Exception e) {
+                Document document = Jsoup.connect(link.getURL()).get();
+                Elements headerElements = document.select("h0, h1, h2, h3, h4, h5, h6");
+                link.setHeaders(getHeadersFrom(headerElements));
+            } catch (IOException e) {
                 System.err.println("Headers: " + e.getMessage());
-                scrapeData.setBrokenURL(true);
+                link.setBrokenURL(true);
             }
         }
     }
+    private static ArrayList<Header> getHeadersFrom(Elements elements){
+        ArrayList<Header> headers = new ArrayList<>();
+        MultiLevelIndex multiLevelIndex = new MultiLevelIndex();
+        LevelCounter levelCounter = new LevelCounter(elements);
+        for (Element element: elements) {
+            headers.add(getHeaderFrom(element, multiLevelIndex, levelCounter));
+        }
+        return headers;
+    }
 
-    private String getHeaderLevelString(int[] headerLevels){
-        String headerString = "";
-        for (int i = 0; i < headerLevels.length; i++) {
-            if (headerLevels[i] != 0){
-                if (i != headerLevels.length - 1){
-                    headerString += headerLevels[i] + ".";
-                }
-                else {
-                    headerString += headerLevels[i];
-                }
-            }
-        }
-        if (headerString.endsWith(".")){
-            headerString = headerString.substring(0, headerString.length() - 1);
-        }
-        return headerString;
+    private static Header getHeaderFrom(Element element, MultiLevelIndex previousIndex, LevelCounter counter){
+        Header header = new Header(
+                element.text(),
+                LevelCounter.getHeaderLevel(element),
+                previousIndex.nextIndex(counter.getIndexLevelOf(element))
+        );
+        return header;
     }
 
     private void translate() {
