@@ -45,11 +45,14 @@ public class LanguageTranslator {
 
     private static DeeplTranslation parseJson(String jsonBody) {
         ObjectMapper mapper = new ObjectMapper();
-        DeeplTranslation translation = new DeeplTranslation();
+        DeeplTranslation translation;
         try {
             translation =  mapper.readValue(jsonBody, DeeplTranslation.class);
         }catch (JsonProcessingException jsonProcessingException) {
             jsonProcessingException.printStackTrace();
+            translation = new DeeplTranslation();
+            translation.setText("error");
+            translation.setDetected_source_language("error");
         }
         return translation;
     }

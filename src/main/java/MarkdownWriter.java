@@ -104,7 +104,7 @@ public class MarkdownWriter {
 	}
 
 	private void appendLinkIndentation(StringBuilder markdownLink, int URLDepth) {
-		markdownLink.append("# <br>");
+		markdownLink.append("# <br> ");
 		for (int i = 0; i < URLDepth; i++) {
 			markdownLink.append("--");
 		}
@@ -122,9 +122,9 @@ public class MarkdownWriter {
 	}
 
 	private void appendURL(StringBuilder markdownLink, String URL) {
-		markdownLink.append("<a>");
+		markdownLink.append("<a> ");
 		markdownLink.append(URL);
-		markdownLink.append("</a>");
+		markdownLink.append(" </a>");
 	}
 
 	private void appendHeaderIndentation(StringBuilder markdownHeader, int headerLevel) {
