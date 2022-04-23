@@ -3,7 +3,7 @@ import java.util.Arrays;
 public class MultiLevelIndex {
     private int[] indices;
     public MultiLevelIndex(){
-        this.indices = new int[0];
+        this.indices = new int[1];
     }
 
     private MultiLevelIndex(int[] array){
@@ -23,9 +23,9 @@ public class MultiLevelIndex {
         return result;
     }
 
-    public MultiLevelIndex nextIndex(int levelDepth){
-        int[] array = Arrays.copyOf(indices, levelDepth);
-        array[array.length - 1]++;
+    public MultiLevelIndex nextIndex(int indexLevelDepth){
+        int[] array = Arrays.copyOf(indices, indexLevelDepth + 1);
+        array[indexLevelDepth]++;
 
         for (int i = 0; i < array.length; i++) {
             if (array[i] == 0) {

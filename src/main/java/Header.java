@@ -29,6 +29,10 @@ public class Header {
         return headerLevelString.toString();
     }
 
+    public MultiLevelIndex getMultilevelIndex(){
+        return this.headerLevelString;
+    }
+
     public void setHeaderLevelString(MultiLevelIndex headerLevelString) {
         this.headerLevelString = headerLevelString;
     }

@@ -5,6 +5,7 @@ import org.jsoup.select.Elements;
 
 import java.io.File;
 import java.io.IOException;
+import java.net.URL;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 
@@ -63,7 +64,8 @@ public class WebScraper {
         if (url != "" && currentDepth <= info.getSearchDepth()) {
             String linkUrl = "";
             try {
-                Document document = Jsoup.connect(url).get();
+                //Jsoup.connect(url).get();
+                Document document = Jsoup.parse(new URL(url).openStream(), "UTF-8", url);
                 Elements documentLinks = document.select("a[href]");
 
                 for (Element link : documentLinks) {
@@ -98,11 +100,15 @@ public class WebScraper {
     private void loadHeaders() {
         for (Link link: links) {
             try {
-                Document document = Jsoup.connect(link.getURL()).get();
-                Elements headerElements = document.select("h0, h1, h2, h3, h4, h5, h6");
+                //Jsoup.connect(link.getURL()).get();
+                Document document = Jsoup.parse(new URL(link.getURL()).openStream(), "UTF-8", link.getURL());
+                Elements headerElements = document.select("h1, h2, h3, h4, h5, h6");
                 link.setHeaders(getHeadersFrom(headerElements));
             } catch (IOException e) {
                 System.err.println("Headers: " + e.getMessage());
+                link.setBrokenURL(true);
+            } catch (IllegalArgumentException e){
+                System.out.println("Malformed URL:" + e.getMessage());
                 link.setBrokenURL(true);
             }
         }
@@ -112,7 +118,9 @@ public class WebScraper {
         MultiLevelIndex multiLevelIndex = new MultiLevelIndex();
         LevelCounter levelCounter = new LevelCounter(elements);
         for (Element element: elements) {
-            headers.add(getHeaderFrom(element, multiLevelIndex, levelCounter));
+            Header header = getHeaderFrom(element, multiLevelIndex, levelCounter);
+            multiLevelIndex = header.getMultilevelIndex();
+            headers.add(header);
         }
         return headers;
     }
