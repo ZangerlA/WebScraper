@@ -1,26 +1,30 @@
 import java.io.*;
 import java.nio.charset.StandardCharsets;
+import java.nio.file.InvalidPathException;
+import java.nio.file.Paths;
 import java.util.List;
 
 public class MarkdownWriter {
 
-	private final File markdownFile;
+	private static File markdownFile;
 	private Writer fileWriter;
 
 	private MarkdownWriter(File file) {
 		markdownFile = file;
 	}
 
-	public static void write(File file, List<Link> links, WebScraperInfo info) throws IOException {
+	public static File write(File file, List<Link> links, WebScraperInfo info) throws IOException {
 		MarkdownWriter writer = new MarkdownWriter(file);
 		writer.openFile();
 		writer.writeToFile(links, info);
 		writer.closeFile();
+		return markdownFile;
 	}
 
 	private void openFile() throws IOException {
+		checkFileIsValid();
 		boolean shouldAppend = !markdownFile.createNewFile();
-		fileWriter = new OutputStreamWriter(new FileOutputStream(markdownFile), StandardCharsets.UTF_8);
+		fileWriter = createUTF8Writer(shouldAppend);
 	}
 
 	public void writeToFile(List<Link> links, WebScraperInfo info) throws IOException {
@@ -42,6 +46,7 @@ public class MarkdownWriter {
 			writeNewLine(1);
 			writeHeadersToFile(link);
 			writeNewLine(1);
+			fileWriter.flush();
 		}
 	}
 
@@ -62,14 +67,14 @@ public class MarkdownWriter {
 		String newLine = getNewLine();
 		infoBlock
 			.append("> INFORMATION:").append(newLine)
-			.append("<br>input: ").append(info.getInitialURL()).append(newLine)
-			.append("<br>depth: ").append(info.getSearchDepth()).append(newLine);
+			.append("<br> input: ").append(info.getInitialURL()).append(newLine)
+			.append("<br> depth: ").append(info.getSearchDepth()).append(newLine);
 		if (info.shouldTranslate()) {
-			infoBlock.append("<br>target language: ").append(info.getTargetLanguage().toString()).append(newLine);
+			infoBlock.append("<br> target language: ").append(info.getTargetLanguage().toString()).append(newLine);
 		}
 		infoBlock
-			.append("<br>start time: ").append(info.getStartTime()).append(newLine)
-			.append("<br>end time: ").append(info.getEndTime()).append(newLine);
+			.append("<br> start time: ").append(info.getStartTime()).append(newLine)
+			.append("<br> end time: ").append(info.getEndTime()).append(newLine);
 
 		return infoBlock.toString();
 	}
@@ -153,6 +158,19 @@ public class MarkdownWriter {
 	private void closeFile() throws IOException {
 		if (markdownFile.exists()) {
 			fileWriter.close();
+		}
+	}
+
+	private Writer createUTF8Writer(boolean shouldAppend) throws FileNotFoundException {
+		return new OutputStreamWriter(new FileOutputStream(markdownFile, shouldAppend), StandardCharsets.UTF_8);
+	}
+
+	private void checkFileIsValid() {
+		try {
+			Paths.get(markdownFile.getPath());
+		} catch(InvalidPathException invalidPathException) {
+			markdownFile = new File("default.md");
+			System.err.println("Given File name not valid. Using \"default.md\" as fallback.");
 		}
 	}
 }

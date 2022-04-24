@@ -9,6 +9,8 @@ import static org.junit.jupiter.api.Assertions.*;
 public class LanguageTranslatorTests {
 
     static LanguageTranslator translator;
+    static final String standardTestText = "Hello World";
+    static final Language standardTestTargetLanguage = Language.EN;
 
     @BeforeAll
     static void setup() {
@@ -31,17 +33,27 @@ public class LanguageTranslatorTests {
 
     @Test
     void WhenTranslatingWithInvalidTargetLanguageThenShouldThrow() {
-        assertThrows(RuntimeException.class, ()-> testTranslate("test", Language.NONE));
+        assertThrows(RuntimeException.class, ()-> testTranslate(standardTestText, Language.NONE));
     }
 
     @Test
     void WhenTranslatingThenResponseShouldNotBeNull() throws ExecutionException, InterruptedException {
-        assertNotNull(testTranslate("Hello World", Language.DE));
+        assertNotNull(testTranslate(standardTestText, standardTestTargetLanguage));
+    }
+
+    @Test
+    void WhenTranslatingThenPromiseShouldResolve() {
+        CompletableFuture<DeeplTranslation> future = translator.translate(standardTestText, standardTestTargetLanguage);
+        assertDoesNotThrow(()-> future.get());
+    }
+
+    @Test
+    void WhenTryingToTranslateSpecialCharactersThenShouldNotThrow() {
+        assertDoesNotThrow(()-> testTranslate("'\"\\\t\b\r\f\n", standardTestTargetLanguage));
     }
 
     private DeeplTranslation testTranslate(String text, Language language) throws ExecutionException, InterruptedException {
-        CompletableFuture<DeeplTranslation> future;
-        future = translator.translate(text, language);
+        CompletableFuture<DeeplTranslation> future = translator.translate(text, language);
         return future.get();
     }
 }

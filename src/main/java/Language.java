@@ -3,15 +3,13 @@ import java.util.Locale;
 public enum Language {
     DE,
     EN,
+    ES,
     FR,
     IT,
-    EL,
-    ES,
-    CS,
-    BG,
-    DA,
-    RU,
     JA,
+    NL,
+    PL,
+    RU,
     ZH,
     NONE;
 

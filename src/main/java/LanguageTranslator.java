@@ -2,9 +2,11 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import java.net.URI;
+import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
 
 public class LanguageTranslator {
@@ -27,8 +29,10 @@ public class LanguageTranslator {
 
     private static HttpRequest buildRequest(String text, Language targetLanguage) {
         String authKeyURI = "auth_key=" + DEEPL_TOKEN;
-        String textURI = "&text=" + text.replace(" ", "%20");
+        String textURI = "&text=" + text;
+        textURI = URLEncoder.encode(textURI, StandardCharsets.UTF_8);
         String targetLanguageURI = "&target_lang=" + targetLanguage.toISO639_1();
+
         URI deeplAPI = URI.create(DEEPL_API + authKeyURI + textURI + targetLanguageURI);
         return HttpRequest.newBuilder(deeplAPI).build();
     }

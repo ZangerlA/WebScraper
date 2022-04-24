@@ -162,7 +162,7 @@ public class WebScraper {
 
     private void writeToFile() {
         try{
-            MarkdownWriter.write(file, links, info);
+            file = MarkdownWriter.write(file, links, info);
         }catch (IOException ioException){
             throw new UncheckedIOException(ioException);
         }

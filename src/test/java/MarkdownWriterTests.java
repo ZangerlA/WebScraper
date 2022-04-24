@@ -9,7 +9,6 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
-import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -27,8 +26,8 @@ public class MarkdownWriterTests {
     }
 
     @AfterEach
-    void deleteFile() throws IOException {
-        file.delete();
+    void deleteFile() {
+        //file.delete();
     }
 
     @Test
@@ -38,13 +37,14 @@ public class MarkdownWriterTests {
     }
 
     @Test
-    void WhenFileNameNotValidThenExceptionShouldBeThrown() throws IOException {
+    void WhenFileNameNotValidThenFallbackNameShouldBeChosen() throws IOException {
         createFile("///.");
-        assertThrows(IOException.class, () -> MarkdownWriter.write(file, standardTestLinks, standardTestInfo));
+        file = MarkdownWriter.write(file, standardTestLinks, standardTestInfo);
+        assertEquals("default.md", file.getName());
     }
 
     @Test
-    void WhenFileAlreadyExistsThenItShouldNotBeOverwritten() throws IOException {
+    void WhenFileAlreadyExistsThenWritingShouldAppend() throws IOException {
         writeTestFile();
         long previousLength = file.length();
         writeTestFile();
@@ -59,17 +59,28 @@ public class MarkdownWriterTests {
     }
 
     @Test
-    void WhenWritingValidLinksThenItShouldMatchComparisonFile() throws IOException {
+    void WhenWritingTestFileThenItShouldMatchComparisonFile() throws IOException {
         writeTestFile();
         Path comparisonFilePath = getComparisonFile();
         long mismatch = Files.mismatch(comparisonFilePath, file.toPath());
-
         assertEquals(-1, mismatch);
+    }
+
+    @Test
+    void WhenWritingValidLinksThenFileShouldNotBeEmpty() throws IOException {
+        writeTestFile();
+        assertNotEquals(0, file.length());
+    }
+
+    @Test
+    void WhenWritingFileThenFileShouldNotBeHidden() throws IOException {
+        writeTestFile();
+        assertFalse(file.isHidden());
     }
 
     private void writeTestFile() throws IOException {
         createFile(testFileName);
-        MarkdownWriter.write(file, standardTestLinks, standardTestInfo);
+        file = MarkdownWriter.write(file, standardTestLinks, standardTestInfo);
     }
 
     private void createFile(String name) {
@@ -125,22 +136,21 @@ public class MarkdownWriterTests {
         String newLine = System.lineSeparator();
         String fileAsString =
                 "> INFORMATION:" + newLine +
-                        "<br>input: www.testURL1.com" + newLine +
-                        "<br>depth: 1" + newLine +
-                        "<br>source language: EN" + newLine +
-                        "<br>target language: DE" + newLine +
-                        "<br>start time: 24-12-2022 20:00:00" + newLine +
-                        "<br>end time: 24-12-2022 20:02:00" + newLine +
+                        "<br> input: www.testURL1.com" + newLine +
+                        "<br> depth: 1" + newLine +
+                        "<br> target language: DE" + newLine +
+                        "<br> start time: 24-12-2022 20:00:00" + newLine +
+                        "<br> end time: 24-12-2022 20:02:00" + newLine +
                         newLine +
-                        "# <br>link to <a>www.testURL1.com</a>" + newLine +
+                        "# <br> link to <a> www.testURL1.com </a>" + newLine +
                         "## link1test1 1" + newLine +
                         "### link1test2 1.1" + newLine +
                         newLine +
-                        "# <br>--> link to <a>www.testURL2.com</a>" + newLine +
+                        "# <br> --> link to <a> www.testURL2.com </a>" + newLine +
                         "## link2test1 1" + newLine +
                         "## link2test2 2" + newLine +
                         newLine +
-                        "# <br>--> broken link <a>www.brokenURL.com</a>" + newLine +
+                        "# <br> --> broken link <a> www.brokenURL.com </a>" + newLine +
                         newLine;
 
         return fileAsString;

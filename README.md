@@ -19,10 +19,9 @@ Steps to get the Scraper running locally.
    In case of Intellij Idea:
    1. Run -> Edit Configurations
    2. Click on the configuration you want to run
-   3. ![](config webscraper.jpg)
+   3. ![Intellij](config_webscraper.jpg)
    4. Modify options -> Environment variables
 
 ## Usage
 You can set the configuration for the scraper through console input when running.\
-Try scraping https://quotes.toscrape.com/ or https://books.toscrape.com/ for example \
-Or run the tests with gradle
+Try scraping https://quotes.toscrape.com/ or https://books.toscrape.com/ for example. \
