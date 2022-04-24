@@ -5,9 +5,7 @@ import java.net.URI;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
-import java.util.ArrayList;
 import java.util.concurrent.CompletableFuture;
-import java.util.concurrent.ExecutionException;
 
 public class LanguageTranslator {
 
@@ -28,8 +26,8 @@ public class LanguageTranslator {
 
     private static HttpRequest buildRequest(String text, Language targetLanguage) {
         String authKeyURI = "auth_key=" + DEEPL_TOKEN;
-        String textURI = "text=" + text;
-        String targetLanguageURI = "target_lang=" + targetLanguage.toISO639_1();
+        String textURI = "&text=" + text.replace(" ", "%20");
+        String targetLanguageURI = "&target_lang=" + targetLanguage.toISO639_1();
         URI deeplAPI = URI.create(DEEPL_API + authKeyURI + textURI + targetLanguageURI);
         return HttpRequest.newBuilder(deeplAPI).build();
     }
@@ -45,9 +43,11 @@ public class LanguageTranslator {
 
     private static DeeplTranslation parseJson(String jsonBody) {
         ObjectMapper mapper = new ObjectMapper();
+        DeeplResponse response;
         DeeplTranslation translation;
         try {
-            translation =  mapper.readValue(jsonBody, DeeplTranslation.class);
+            response =  mapper.readValue(jsonBody, DeeplResponse.class);
+            translation = response.getTranslations().get(0);
         }catch (JsonProcessingException jsonProcessingException) {
             jsonProcessingException.printStackTrace();
             translation = new DeeplTranslation();
@@ -55,14 +55,5 @@ public class LanguageTranslator {
             translation.setDetected_source_language("error");
         }
         return translation;
-    }
-
-    public DeeplTranslation[] waitOnTranslationsComplete(ArrayList<CompletableFuture<DeeplTranslation>> futures) throws ExecutionException, InterruptedException {
-        CompletableFuture.allOf(futures.toArray(new CompletableFuture[0])).get();
-        DeeplTranslation[] result = new DeeplTranslation[futures.size()];
-        for (int i = 0; i < result.length; i++) {
-            result[i] = futures.get(i).get();
-        }
-        return result;
     }
 }

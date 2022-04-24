@@ -66,9 +66,7 @@ public class MarkdownWriter {
 			.append("<br>input: ").append(info.getInitialURL()).append(newLine)
 			.append("<br>depth: ").append(info.getSearchDepth()).append(newLine);
 		if (info.shouldTranslate()) {
-			infoBlock
-				.append("<br>source language: ").append(info.getSourceLanguage().toString()).append(newLine)
-				.append("<br>target language: ").append(info.getTargetLanguage().toString()).append(newLine);
+			infoBlock.append("<br>target language: ").append(info.getTargetLanguage().toString()).append(newLine);
 		}
 		infoBlock
 			.append("<br>start time: ").append(info.getStartTime()).append(newLine)

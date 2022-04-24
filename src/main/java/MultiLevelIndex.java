@@ -6,7 +6,7 @@ public class MultiLevelIndex {
         this.indices = new int[1];
     }
 
-    private MultiLevelIndex(int[] array){
+    public MultiLevelIndex(int[] array){
         this.indices = Arrays.copyOf(array, array.length);
     }
 

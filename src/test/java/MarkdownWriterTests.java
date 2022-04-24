@@ -9,6 +9,7 @@ import java.nio.file.Path;
 import java.time.LocalDateTime;
 import java.time.Month;
 import java.util.ArrayList;
+import java.util.Arrays;
 
 import static org.junit.jupiter.api.Assertions.*;
 
@@ -89,10 +90,10 @@ public class MarkdownWriterTests {
         link1.setBrokenURL(false);
         link2.setBrokenURL(false);
         link3.setBrokenURL(true);
-        link1.addHeader(new Header("link1test1", 1, "1"));
-        link1.addHeader(new Header("link1test2", 2, "1.1"));
-        link2.addHeader(new Header("link2test1", 1, "1"));
-        link2.addHeader(new Header("link2test2", 1, "2"));
+        link1.addHeader(new Header("link1test1", 1, new MultiLevelIndex(new int[]{1})));
+        link1.addHeader(new Header("link1test2", 2, new MultiLevelIndex(new int[]{1, 1})));
+        link2.addHeader(new Header("link2test1", 1, new MultiLevelIndex(new int[]{1})));
+        link2.addHeader(new Header("link2test2", 1, new MultiLevelIndex(new int[]{2})));
         links.add(link1);
         links.add(link2);
         links.add(link3);

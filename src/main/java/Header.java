@@ -1,7 +1,14 @@
+import java.util.concurrent.CompletableFuture;
+
 public class Header {
     private String content;
     private int level;
     private MultiLevelIndex headerLevelString;
+    private CompletableFuture<DeeplTranslation> futureTranslation;
+
+    public Header() {
+
+    }
 
     public Header(String header, int headerLevel, MultiLevelIndex numInLevel) {
         this.content = header;
@@ -35,5 +42,13 @@ public class Header {
 
     public void setHeaderLevelString(MultiLevelIndex headerLevelString) {
         this.headerLevelString = headerLevelString;
+    }
+
+    public CompletableFuture<DeeplTranslation> getFutureTranslation() {
+        return futureTranslation;
+    }
+
+    public void setFutureTranslation(CompletableFuture<DeeplTranslation> futureTranslation) {
+        this.futureTranslation = futureTranslation;
     }
 }
