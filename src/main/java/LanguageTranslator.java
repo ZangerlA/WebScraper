@@ -6,6 +6,7 @@ import java.net.URLEncoder;
 import java.net.http.HttpClient;
 import java.net.http.HttpRequest;
 import java.net.http.HttpResponse;
+import java.nio.ByteBuffer;
 import java.nio.charset.StandardCharsets;
 import java.util.concurrent.CompletableFuture;
 
@@ -28,9 +29,9 @@ public class LanguageTranslator {
     }
 
     private static HttpRequest buildRequest(String text, Language targetLanguage) {
+        text = URLEncoder.encode(text, StandardCharsets.UTF_8);
         String authKeyURI = "auth_key=" + DEEPL_TOKEN;
         String textURI = "&text=" + text;
-        textURI = URLEncoder.encode(textURI, StandardCharsets.UTF_8);
         String targetLanguageURI = "&target_lang=" + targetLanguage.toISO639_1();
 
         URI deeplAPI = URI.create(DEEPL_API + authKeyURI + textURI + targetLanguageURI);
@@ -48,16 +49,16 @@ public class LanguageTranslator {
 
     private static DeeplTranslation parseJson(String jsonBody) {
         ObjectMapper mapper = new ObjectMapper();
-        DeeplResponse response;
         DeeplTranslation translation;
+
         try {
-            response =  mapper.readValue(jsonBody, DeeplResponse.class);
+            DeeplResponse response =  mapper.readValue(jsonBody, DeeplResponse.class);
             translation = response.getTranslations().get(0);
         }catch (JsonProcessingException jsonProcessingException) {
             jsonProcessingException.printStackTrace();
             translation = new DeeplTranslation();
-            translation.setText("error");
-            translation.setDetected_source_language("error");
+            translation.setText("translation error");
+            translation.setDetected_source_language("translation error");
         }
         return translation;
     }

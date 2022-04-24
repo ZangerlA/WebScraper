@@ -27,7 +27,7 @@ public class MarkdownWriterTests {
 
     @AfterEach
     void deleteFile() {
-        //file.delete();
+        file.delete();
     }
 
     @Test
