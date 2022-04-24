@@ -25,3 +25,6 @@ Steps to get the Scraper running locally.
 ## Usage
 You can set the configuration for the scraper through console input when running.\
 Try scraping https://quotes.toscrape.com/ or https://books.toscrape.com/ for example. \
+Or run Tests with gradle
+
+> **IMPORTANT**: DeepL API Key must also be set for the test configuration. An Exception is in place to tell you if the Key is not integrated properly.
