@@ -40,6 +40,16 @@ public class WebScraper {
         translator = new LanguageTranslator();
     }
 
+    public WebScraper(String url, Language targetLanguage, int searchDepth) {
+        this.info = new WebScraperInfo();
+        this.info.setInitialURL(url);
+        this.info.setSearchDepth(searchDepth);
+        this.info.setTargetLanguage(targetLanguage);
+        this.links = new ArrayList<>();
+        this.file = new File("default.md");
+        translator = new LanguageTranslator();
+    }
+    
     public WebScraper(String url, Language targetLanguage, String outputFileName, int searchDepth) {
         this.info = new WebScraperInfo();
         this.info.setInitialURL(url);
