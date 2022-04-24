@@ -17,24 +17,29 @@ public class LanguageTranslatorTests {
 
     @Test
     void WhenTranslatingEnglishToGermanThenShouldReturnCorrectTranslation() throws ExecutionException, InterruptedException {
-        DeeplTranslation translation = getTranslation("Hello World", Language.DE);
+        DeeplTranslation translation = testTranslate("Hello World", Language.DE);
         System.out.println(translation.getText());
         assertEquals("Hallo Welt", translation.getText());
     }
 
     @Test
     void WhenTranslatingGermanToEnglishThenSourceLanguageShouldBeGerman() throws ExecutionException, InterruptedException {
-        DeeplTranslation translation = getTranslation("Hallo Welt", Language.EN);
+        DeeplTranslation translation = testTranslate("Übersetzung", Language.EN);
 
         assertEquals(Language.DE.toString(), translation.getDetected_source_language());
     }
 
     @Test
     void WhenTranslatingWithInvalidTargetLanguageThenShouldThrow() {
-        assertThrows(RuntimeException.class, ()-> getTranslation("test", Language.NONE));
+        assertThrows(RuntimeException.class, ()-> testTranslate("test", Language.NONE));
     }
 
-    private DeeplTranslation getTranslation(String text, Language language) throws ExecutionException, InterruptedException {
+    @Test
+    void WhenTranslatingThenResponseShouldNotBeNull() throws ExecutionException, InterruptedException {
+        assertNotNull(testTranslate("Hello World", Language.DE));
+    }
+
+    private DeeplTranslation testTranslate(String text, Language language) throws ExecutionException, InterruptedException {
         CompletableFuture<DeeplTranslation> future;
         future = translator.translate(text, language);
         return future.get();

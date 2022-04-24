@@ -10,11 +10,12 @@ import java.util.concurrent.CompletableFuture;
 public class LanguageTranslator {
 
     private static final String DEEPL_API = "https://api-free.deepl.com/v2/translate?";
-    private static final String DEEPL_TOKEN = System.getenv("DEEPL_TOKEN");
+    private static String DEEPL_TOKEN;
     private HttpClient client;
 
     public LanguageTranslator() {
         client = HttpClient.newHttpClient();
+        DEEPL_TOKEN = getDeepLTokenFromSystem();
     }
 
     public CompletableFuture<DeeplTranslation> translate(String text, Language targetLanguage) {
@@ -55,5 +56,13 @@ public class LanguageTranslator {
             translation.setDetected_source_language("error");
         }
         return translation;
+    }
+
+    private static String getDeepLTokenFromSystem() {
+        String token = System.getenv("DEEPL_TOKEN");
+        if(token == null) {
+            throw new RuntimeException("Could not read DEEPL_TOKEN from Environment. Please check if set correctly.");
+        }
+        return token;
     }
 }

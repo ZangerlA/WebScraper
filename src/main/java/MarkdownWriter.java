@@ -1,12 +1,11 @@
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
+import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
 
 public class MarkdownWriter {
 
 	private final File markdownFile;
-	private FileWriter fileWriter;
+	private Writer fileWriter;
 
 	private MarkdownWriter(File file) {
 		markdownFile = file;
@@ -21,7 +20,7 @@ public class MarkdownWriter {
 
 	private void openFile() throws IOException {
 		boolean shouldAppend = !markdownFile.createNewFile();
-		fileWriter = new FileWriter(markdownFile, shouldAppend);
+		fileWriter = new OutputStreamWriter(new FileOutputStream(markdownFile), StandardCharsets.UTF_8);
 	}
 
 	public void writeToFile(List<Link> links, WebScraperInfo info) throws IOException {
