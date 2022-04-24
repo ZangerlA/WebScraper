@@ -49,7 +49,7 @@ public class WebScraper {
         this.file = new File("default.md");
         translator = new LanguageTranslator();
     }
-    
+
     public WebScraper(String url, Language targetLanguage, String outputFileName, int searchDepth) {
         this.info = new WebScraperInfo();
         this.info.setInitialURL(url);
