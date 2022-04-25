@@ -49,7 +49,12 @@ public class WebScraperInfo {
 	}
 
 	public void setSearchDepth(int searchDepth) {
-		this.searchDepth = searchDepth;
+		if (searchDepth > 0){
+			this.searchDepth = searchDepth;
+		}else {
+			this.searchDepth = 1;
+		}
+
 	}
 
 	public String getStartTime() {
