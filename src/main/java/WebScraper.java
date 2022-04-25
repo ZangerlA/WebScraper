@@ -21,36 +21,18 @@ public class WebScraper {
     private static LanguageTranslator translator;
 
     public WebScraper(String url, int searchDepth) {
-        this.info = new WebScraperInfo();
-        this.info.setInitialURL(url);
-        this.info.setSearchDepth(searchDepth);
-        this.info.setTargetLanguage(Language.NONE);
-        this.links = new ArrayList<>();
-        this.file = new File("default.md");
-        translator = new LanguageTranslator();
+        this(url, searchDepth,"default.md", Language.NONE);
     }
 
-    public WebScraper(String url, String outputFileName, int searchDepth) {
-        this.info = new WebScraperInfo();
-        this.info.setInitialURL(url);
-        this.info.setSearchDepth(searchDepth);
-        this.info.setTargetLanguage(Language.NONE);
-        this.links = new ArrayList<>();
-        this.file = new File(outputFileName);
-        translator = new LanguageTranslator();
+    public WebScraper(String url, int searchDepth, String outputFileName) {
+        this(url, searchDepth, outputFileName, Language.NONE);
     }
 
-    public WebScraper(String url, Language targetLanguage, int searchDepth) {
-        this.info = new WebScraperInfo();
-        this.info.setInitialURL(url);
-        this.info.setSearchDepth(searchDepth);
-        this.info.setTargetLanguage(targetLanguage);
-        this.links = new ArrayList<>();
-        this.file = new File("default.md");
-        translator = new LanguageTranslator();
+    public WebScraper(String url, int searchDepth, Language targetLanguage) {
+        this(url, searchDepth, "default.md", targetLanguage);
     }
 
-    public WebScraper(String url, Language targetLanguage, String outputFileName, int searchDepth) {
+    public WebScraper(String url, int searchDepth, String outputFileName, Language targetLanguage) {
         this.info = new WebScraperInfo();
         this.info.setInitialURL(url);
         this.info.setSearchDepth(searchDepth);
@@ -62,66 +44,66 @@ public class WebScraper {
 
     public void scrape() {
         info.setStartTime(LocalDateTime.now());
-        getLinks(info.getInitialURL(), 0);
+        loadLinks(info.getInitialURL(), 0);
         loadHeaders();
         if (info.shouldTranslate()) {
-            waitOnTranslationsComplete();
+            completeTranslations();
         }
         info.setEndTime(LocalDateTime.now());
         writeToFile();
     }
 
-    private void getLinks(String url, int currentDepth) {
-        if (url != "" && currentDepth <= info.getSearchDepth()) {
-            String linkUrl = "";
-            try {
-                //Jsoup.connect(url).get();
-                Document document = Jsoup.parse(new URL(url).openStream(), "UTF-8", url);
-                Elements documentLinks = document.select("a[href]");
+    private void loadLinks(String url, int currentDepth) {
+        if (url.equals("") || currentDepth > info.getSearchDepth()){
+            return;
+        }
+        String nextUrl = "";
+        try {
+            Document document = Jsoup.parse(new URL(url).openStream(), "UTF-8", url);
+            Elements documentLinks = document.select("a[href]");
 
-                for (Element link : documentLinks) {
-                    linkUrl = link.attr("abs:href");
-                    addLink(linkUrl, currentDepth);
+            for (Element linkElement : documentLinks) {
+                nextUrl = linkElement.attr("abs:href");
+                if (!isAlreadyScraped(nextUrl)){
+                    addLink(nextUrl, currentDepth, false);
+                    loadLinks(url, currentDepth + 1);
                 }
-
-            } catch (IOException e) {
-                System.err.println("broken URL: '" + url + "'");
-                Link errorLink = new Link();
-                errorLink.setURL(linkUrl);
-                errorLink.setBrokenURL(true);
             }
+        } catch (IOException e) {
+            System.err.println("broken URL: '" + url + "'");
+            addLink(nextUrl, currentDepth, true);
         }
     }
 
-    private void addLink(String linkUrl, int currentDepth){
-        boolean alreadyCrawled = false;
+    private boolean isAlreadyScraped(String url) {
         for (Link link: links) {
-            if (linkUrl.equals(link.getURL())){
-                alreadyCrawled = true;
+            if (url.equals(link.getURL())){
+                return true;
             }
         }
-        if (!alreadyCrawled){
-            Link link = new Link();
-            link.setURL(linkUrl);
-            links.add(link);
+        return false;
+    }
 
-            getLinks(linkUrl, currentDepth + 1);
-        }
+    private void addLink(String url, int currentDepth, boolean isBroken){
+        Link link = new Link();
+        link.setURL(url);
+        link.setURLDepth(currentDepth);
+        link.setBrokenURL(isBroken);
+        links.add(link);
     }
 
     private void loadHeaders() {
         for (Link link: links) {
+            if (link.isBrokenURL()){
+                return;
+            }
             try {
-                //Jsoup.connect(link.getURL()).get();
+                // This is very inefficient. Will be fixed in Phase 2.
                 Document document = Jsoup.parse(new URL(link.getURL()).openStream(), "UTF-8", link.getURL());
                 Elements headerElements = document.select("h1, h2, h3, h4, h5, h6");
                 link.setHeaders(getHeadersFrom(headerElements, info));
             } catch (IOException e) {
                 System.err.println("Headers: " + e.getMessage());
-                link.setBrokenURL(true);
-            } catch (IllegalArgumentException e){
-                System.out.println("Malformed URL:" + e.getMessage());
-                link.setBrokenURL(true);
             }
         }
     }
@@ -155,7 +137,7 @@ public class WebScraper {
         return translator.translate(text, targetLanguage);
     }
 
-    private void waitOnTranslationsComplete() {
+    private void completeTranslations() {
         for(Link link : links) {
             for(Header header : link.getHeaders()) {
                 CompletableFuture<DeeplTranslation> futureTranslation = header.getFutureTranslation();
