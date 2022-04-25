@@ -2,10 +2,11 @@
 # Getting Started
 Steps to get the Scraper running locally.
 
-## Prerequisites
+## What we use
 * [JDK 12](https://www.oracle.com/java/technologies/downloads/) or higher
-* [jsoup 1.14.3](https://jsoup.org/download)
-* [DeepL API Key](https://www.deepl.com/)
+* [jsoup](https://jsoup.org/download)
+* [jackson](https://github.com/FasterXML/jackson)
+* [DeepL API](https://www.deepl.com/)
 
 ## Installation
 1. Clone the repo
