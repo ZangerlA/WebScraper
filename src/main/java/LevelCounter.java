@@ -27,7 +27,7 @@ public class LevelCounter {
                 return i;
             }
         }
-        return 0;
+        return -1;
     }
 
     public static int getHeaderLevel(Element element){
