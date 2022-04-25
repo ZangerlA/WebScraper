@@ -3,7 +3,6 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 import java.io.File;
-import java.io.IOException;
 import java.time.Duration;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -30,7 +29,7 @@ public class WebScraperTests {
     }
 
     @Test
-    public void WhenScrapingWithValidArgumentsThenShouldNotThrow() {
+    public void WhenValidArgumentsThenShouldNotThrow() {
         assertDoesNotThrow(()-> webScraperWithUrlDepth.scrape());
         assertDoesNotThrow(()-> webScraperWithUrlDepthLanguage.scrape());
         assertDoesNotThrow(()-> webScraperWithUrlDepthFile.scrape());
@@ -38,12 +37,12 @@ public class WebScraperTests {
     }
 
     @Test
-    public void WhenScrapingWithValidArgumentsThenScraperShouldFinish() {
+    public void WhenValidArgumentsThenScraperShouldFinish() {
         assertTimeout(Duration.ofMinutes(1), ()-> webScraperWithUrlDepth.scrape());
     }
 
     @Test
-    public void WhenScrapingWithValidArgumentsThenFileShouldExist() {
+    public void WhenValidArgumentsThenFileShouldExist() {
         webScraperWithUrlDepthFile.scrape();
         File file = new File(fileTestName);
         assertTrue(file.exists());
@@ -55,7 +54,7 @@ public class WebScraperTests {
         assertDoesNotThrow(()-> webScraperWithUrlDepth.scrape());
     }
     @Test
-    public void WhenInvalidFileNameThenDoesnotThrow(){
+    public void WhenInvalidFileNameThenDoesNotThrow(){
         webScraperWithUrlDepth = new WebScraper("https://quotes.toscrape.com/",1, "//.");
         assertDoesNotThrow(()-> webScraperWithUrlDepth.scrape());
     }
