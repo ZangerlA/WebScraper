@@ -18,9 +18,13 @@ public class ConsoleUserInput {
     }
 
     private void readUrlFromConsole(){
-        System.out.println("Enter url:");
+        System.out.println("Enter url: ");
         try{
+            String urlRegex = "/^(http(s)?:\\/\\/)[\\w.-]+(?:\\.[\\w\\.-]+)+[\\w\\-\\._~:/?#[\\]@!\\$&'\\(\\)\\*\\+,;=.]+$/gm]";
             this.url = bufferedReader.readLine().trim();
+            if (!url.matches(urlRegex)){
+                this.url = "https://" + url;
+            }
         }catch (IOException e){
             System.out.println(e.getMessage());
         }
