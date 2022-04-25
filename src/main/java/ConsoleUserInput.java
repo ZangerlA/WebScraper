@@ -20,7 +20,7 @@ public class ConsoleUserInput {
     private void readUrlFromConsole(){
         System.out.println("Enter url:");
         try{
-            this.url = bufferedReader.readLine();
+            this.url = bufferedReader.readLine().trim();
         }catch (IOException e){
             System.out.println(e.getMessage());
         }
@@ -45,11 +45,11 @@ public class ConsoleUserInput {
     }
 
     private void readSaveFilePathFromConsole(){
-        System.out.println("Do you want to determine in what File you want to save the crawled data? (y/n)");
+        System.out.println("Do you want to save the crawled data in a specific file? (y/n)");
         try {
             saveFilePath = bufferedReader.readLine();
             if (saveFilePath.toUpperCase().equals("Y")) {
-                System.out.println("Enter the file path: (Path or Name)");
+                System.out.println("Enter the file path or name: (path or name)");
                 saveFilePath = bufferedReader.readLine();
             }
             else if (saveFilePath.toUpperCase().equals("N")){
@@ -64,15 +64,14 @@ public class ConsoleUserInput {
     }
 
     private void readTargetLanguageFromConsole(){
-        System.out.println("Do you want to have the Headers translated? (y/n)");
+        System.out.println("Do you want to translate the headers? (y/n)");
         try {
             String translateLanguage = bufferedReader.readLine();
             if (translateLanguage.toUpperCase().equals("Y")){
-                System.out.println("Enter a Language in ISO639_1 Standard: (Bsp.: DE, EN, IT,...)");
+                System.out.println("Enter the target language in ISO639_1 standard: (Bsp.: DE, EN, IT,...)");
                 translateLanguage = bufferedReader.readLine();
                 if (containsLanguage(translateLanguage)){
                     targetLanguage = Language.valueOf(translateLanguage);
-                    System.out.println("ok language");
                 }
                 else {
                     readTargetLanguageFromConsole();
