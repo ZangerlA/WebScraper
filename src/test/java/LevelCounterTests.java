@@ -27,10 +27,12 @@ public class LevelCounterTests {
     void WhenGetLevelHeaderWithHThreeThenReturnThree(){
         assertEquals(2,LevelCounter.getHeaderLevel(elementHTwo));
     }
+
     @Test
     void WhenGetNextIndexLevelOfWithElementHFourThenReturnThree(){
         assertEquals(2,levelCounter.getIndexLevelOf(elementHFour));
     }
+
     @Test
     void WhenGetNextIndexLevelOfWithElementHFiveThenReturnMinusOneNotInIndexLevels(){
         assertEquals(-1,levelCounter.getIndexLevelOf(elementHFive));
