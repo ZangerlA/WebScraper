@@ -17,7 +17,7 @@ Steps to get the Scraper running locally.
    ```sh
    DEEPL_TOKEN=[YOUR_SECRET_DEEPL_TOKEN]
    ```
-   In case of Intellij Idea:
+   In case of Intellij Idea: 
    1. Run -> Edit Configurations
    2. Click on the configuration you want to run
    3. ![Intellij](config_webscraper.jpg)
