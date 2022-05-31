@@ -12,62 +12,36 @@ import java.util.concurrent.CompletableFuture;
 
 public class LanguageTranslator {
 
-    private static final String DEEPL_API = "https://api-free.deepl.com/v2/translate?";
-    private static String DEEPL_TOKEN;
     private HttpClient client;
 
     public LanguageTranslator() {
         client = HttpClient.newHttpClient();
-        DEEPL_TOKEN = getDeepLTokenFromSystem();
     }
 
     public CompletableFuture<DeeplTranslation> translate(String text, Language targetLanguage) {
-        HttpRequest request = buildRequest(text, targetLanguage);
+        HttpRequest request = TranslationRequestBuilder.buildRequest(text, targetLanguage);
         CompletableFuture<HttpResponse<String>> result;
         result = client.sendAsync(request, HttpResponse.BodyHandlers.ofString());
-        return result.thenApply(LanguageTranslator::parse);
+        return result.thenApply((response) -> LanguageTranslator.parseJson(response, text));
     }
 
-    private static HttpRequest buildRequest(String text, Language targetLanguage) {
-        text = URLEncoder.encode(text, StandardCharsets.UTF_8);
-        String authKeyURI = "auth_key=" + DEEPL_TOKEN;
-        String textURI = "&text=" + text;
-        String targetLanguageURI = "&target_lang=" + targetLanguage.toISO639_1();
-
-        URI deeplAPI = URI.create(DEEPL_API + authKeyURI + textURI + targetLanguageURI);
-        return HttpRequest.newBuilder(deeplAPI).build();
-    }
-
-    private static DeeplTranslation parse(HttpResponse<String> response) {
-        String jsonBody = getBodyFromResponse(response);
-        return parseJson(jsonBody);
-    }
-
-    private static String getBodyFromResponse(HttpResponse<String> response) {
-        return response.body();
-    }
-
-    private static DeeplTranslation parseJson(String jsonBody) {
-        ObjectMapper mapper = new ObjectMapper();
+    private static DeeplTranslation parseJson(HttpResponse<String> httpResponse, String text) {
+        JsonParser jsonParser = new JsonParser();
         DeeplTranslation translation;
 
         try {
-            DeeplResponse response =  mapper.readValue(jsonBody, DeeplResponse.class);
-            translation = response.getTranslations().get(0);
-        }catch (JsonProcessingException jsonProcessingException) {
-            jsonProcessingException.printStackTrace();
-            translation = new DeeplTranslation();
-            translation.setText("translation error");
-            translation.setDetected_source_language("translation error");
+            DeeplResponse deeplResponse =  jsonParser.parse(httpResponse.body(), DeeplResponse.class);
+            translation = deeplResponse.getElementAt(0);
+        }catch (JsonProcessingException e) {
+            translation = getErrorTranslationFor(text);
         }
         return translation;
     }
 
-    private static String getDeepLTokenFromSystem() {
-        String token = System.getenv("DEEPL_TOKEN");
-        if(token == null) {
-            throw new RuntimeException("Could not read DEEPL_TOKEN from Environment. Please check if set correctly.");
-        }
-        return token;
+    private static DeeplTranslation getErrorTranslationFor(String text) {
+        DeeplTranslation translation = new DeeplTranslation();
+        translation.setText(text + " (could not translate)");
+        translation.setDetected_source_language("translation error");
+        return translation;
     }
 }

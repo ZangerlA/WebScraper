@@ -20,8 +20,8 @@ Steps to get the Scraper running locally.
    In case of Intellij Idea: 
    1. Run -> Edit Configurations
    2. Click on the configuration you want to run
-   3. ![Intellij](config_webscraper.jpg)
-   4. Modify options -> Environment variables
+   3. Modify options -> Environment variables
+   ![Intellij](config_webscraper.jpg)
 
 ## Usage
 You can set the configuration for the scraper through console input when running.\

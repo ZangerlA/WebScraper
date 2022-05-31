@@ -13,7 +13,7 @@ public class MarkdownWriter {
 		markdownFile = file;
 	}
 
-	public static File write(File file, List<Link> links, WebScraperInfo info) throws IOException {
+	public static synchronized File write(File file, List<Link> links, WebScraperInfo info) throws IOException {
 		MarkdownWriter writer = new MarkdownWriter(file);
 		writer.openFile();
 		writer.writeToFile(links, info);
@@ -24,13 +24,23 @@ public class MarkdownWriter {
 	private void openFile() throws IOException {
 		checkFileIsValid();
 		boolean shouldAppend = !markdownFile.createNewFile();
-		fileWriter = createUTF8Writer(shouldAppend);
+		try {
+			fileWriter = createUTF8Writer(shouldAppend);
+		} catch(IOException e) {
+			throw new IOException("Could not open file.", e);
+		}
 	}
 
 	public void writeToFile(List<Link> links, WebScraperInfo info) throws IOException {
-		writeInfoBlockToFile(info);
-		writeLinksToFile(links);
-		printFilePath();
+		try{
+			writeInfoBlockToFile(info);
+			writeLinksToFile(links);
+			printFilePath();
+		} catch(IOException e) {
+			throw new IOException("Error writing to file.", e);
+		} finally {
+			closeFile();
+		}
 	}
 
 	private void writeInfoBlockToFile(WebScraperInfo info) throws IOException {
@@ -46,7 +56,6 @@ public class MarkdownWriter {
 			writeNewLine(1);
 			writeHeadersToFile(link);
 			writeNewLine(1);
-			fileWriter.flush();
 		}
 	}
 
@@ -156,8 +165,13 @@ public class MarkdownWriter {
 	}
 
 	private void closeFile() throws IOException {
-		if (markdownFile.exists()) {
+		if (!markdownFile.exists()) {
+			return;
+		}
+		try {
 			fileWriter.close();
+		} catch(IOException e) {
+			throw new IOException("Could not close FileWriter.", e);
 		}
 	}
 
