@@ -154,7 +154,7 @@ public class WebScraper {
 
     private void writeToFile() {
         try{
-            file = MarkdownWriter.write(file, links, info);
+            MarkdownWriter.write(file, links, info);
         }catch (IOException ioException){
             throw new UncheckedIOException(ioException);
         }

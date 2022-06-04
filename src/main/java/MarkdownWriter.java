@@ -6,19 +6,18 @@ import java.util.List;
 
 public class MarkdownWriter {
 
-	private static File markdownFile;
+	private File markdownFile;
 	private Writer fileWriter;
 
 	private MarkdownWriter(File file) {
 		markdownFile = file;
 	}
 
-	public static synchronized File write(File file, List<Link> links, WebScraperInfo info) throws IOException {
+	public static void write(File file, List<Link> links, WebScraperInfo info) throws IOException {
 		MarkdownWriter writer = new MarkdownWriter(file);
 		writer.openFile();
 		writer.writeToFile(links, info);
 		writer.closeFile();
-		return markdownFile;
 	}
 
 	private void openFile() throws IOException {
@@ -31,7 +30,7 @@ public class MarkdownWriter {
 		}
 	}
 
-	public void writeToFile(List<Link> links, WebScraperInfo info) throws IOException {
+	public synchronized void writeToFile(List<Link> links, WebScraperInfo info) throws IOException {
 		try{
 			writeInfoBlockToFile(info);
 			writeLinksToFile(links);

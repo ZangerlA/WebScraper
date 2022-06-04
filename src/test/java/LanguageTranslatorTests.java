@@ -20,7 +20,7 @@ public class LanguageTranslatorTests {
     @Test
     void WhenTranslatingEnglishToGermanThenShouldReturnCorrectTranslation() throws ExecutionException, InterruptedException {
         DeeplTranslation translation = testTranslate("Hello World", Language.DE);
-        System.out.println(translation.getText());
+
         assertEquals("Hallo Welt", translation.getText());
     }
 
