@@ -5,7 +5,6 @@ import org.jsoup.select.Elements;
 
 import java.io.File;
 import java.io.IOException;
-import java.net.URL;
 import java.io.UncheckedIOException;
 
 import java.time.LocalDateTime;
@@ -20,18 +19,6 @@ public class WebScraper {
     private ArrayList<Link> links;
     private static LanguageTranslator translator;
 
-    public WebScraper(String url, int searchDepth) {
-        this(url, searchDepth,"default.md", Language.NONE);
-    }
-
-    public WebScraper(String url, int searchDepth, String outputFileName) {
-        this(url, searchDepth, outputFileName, Language.NONE);
-    }
-
-    public WebScraper(String url, int searchDepth, Language targetLanguage) {
-        this(url, searchDepth, "default.md", targetLanguage);
-    }
-
     public WebScraper(String url, int searchDepth, String outputFileName, Language targetLanguage) {
         this.info = new WebScraperInfo();
         this.info.setInitialURL(url);
@@ -44,34 +31,36 @@ public class WebScraper {
 
     public void scrape() {
         info.setStartTime(LocalDateTime.now());
-        loadLinks(info.getInitialURL(), 0);
-        loadHeaders();
+        loadDocument(info.getInitialURL(), 0);
         if (info.shouldTranslate()) {
             completeTranslations();
         }
         info.setEndTime(LocalDateTime.now());
         writeToFile();
     }
-
-    private void loadLinks(String url, int currentDepth) {
-        if (url.equals("") || currentDepth > info.getSearchDepth()){
+    private void loadDocument(String url, int currentDepth){
+        if (url.equals("")|| currentDepth > info.getSearchDepth()){
             return;
         }
-        String nextUrl = "";
         try {
-            Document document = Jsoup.parse(new URL(url).openStream(), "UTF-8", url);
-            Elements documentLinks = document.select("a[href]");
-
-            for (Element linkElement : documentLinks) {
-                nextUrl = linkElement.attr("abs:href");
-                if (!isAlreadyScraped(nextUrl)){
-                    addLink(nextUrl, currentDepth, false);
-                    loadLinks(url, currentDepth + 1);
-                }
-            }
-        } catch (IOException e) {
+            JsoupDocument document = new JsoupDocument(url);
+            Link link = addLink(url, currentDepth, false);
+            loadHeaders(document, link);
+            loadLinks(document, currentDepth);
+        }catch (IOException e) {
             System.err.println("broken URL: '" + url + "'");
-            addLink(nextUrl, currentDepth, true);
+            addLink(url, currentDepth, true);
+        }
+    }
+
+    private void loadLinks(JsoupDocument document, int currentDepth) {
+        JsoupElements elements = new JsoupElements(document, "a[href]");
+
+        for (Element linkElement : elements.getElements()) {
+            String nextUrl = linkElement.attr("abs:href");
+            if (!isAlreadyScraped(nextUrl)) {
+                loadDocument(nextUrl, currentDepth + 1);
+            }
         }
     }
 
@@ -84,28 +73,21 @@ public class WebScraper {
         return false;
     }
 
-    private void addLink(String url, int currentDepth, boolean isBroken){
+    private Link addLink(String url, int currentDepth, boolean isBroken){
         Link link = new Link();
         link.setURL(url);
         link.setURLDepth(currentDepth);
         link.setBrokenURL(isBroken);
         links.add(link);
+        return link;
     }
 
-    private void loadHeaders() {
-        for (Link link: links) {
-            if (link.isBrokenURL()){
-                return;
-            }
-            try {
-                // This is very inefficient. Will be fixed in Phase 2.
-                Document document = Jsoup.parse(new URL(link.getURL()).openStream(), "UTF-8", link.getURL());
-                Elements headerElements = document.select("h1, h2, h3, h4, h5, h6");
-                link.setHeaders(getHeadersFrom(headerElements, info));
-            } catch (IOException e) {
-                System.err.println("Headers: " + e.getMessage());
-            }
+    private void loadHeaders(JsoupDocument document, Link link) {
+        if (link.isBrokenURL()) {
+            return;
         }
+        JsoupElements elements = new JsoupElements(document, "h1, h2, h3, h4, h5, h6");
+        link.setHeaders(getHeadersFrom(elements.getElements(), info));
     }
 
     private static ArrayList<Header> getHeadersFrom(Elements elements, WebScraperInfo info){
