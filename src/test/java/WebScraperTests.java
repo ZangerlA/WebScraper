@@ -46,7 +46,7 @@ public class WebScraperTests {
     }
     @Test
     public void WhenInvalidFileNameThenDoesNotThrow(){
-        webScraperWithUrlDepthLanguageFile = new WebScraper("https://quotes.toscrape.com/",1, "//.", Language.EN);
+        webScraperWithUrlDepthLanguageFile = new WebScraper("https://quotes.toscrape.com/",1, "|", Language.EN);
         assertDoesNotThrow(()-> webScraperWithUrlDepthLanguageFile.scrape());
     }
 }
