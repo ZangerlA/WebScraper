@@ -4,7 +4,7 @@ import java.io.InputStreamReader;
 
 public class ConsoleUserInput {
     private BufferedReader bufferedReader;
-    private String url;
+    private String[] urls;
     private int searchDepth;
     private String saveFilePath;
     private Language targetLanguage;
@@ -18,13 +18,10 @@ public class ConsoleUserInput {
     }
 
     private void readUrlFromConsole(){
-        System.out.println("Enter url: ");
+        System.out.println("Enter urls separated with space: ");
         try{
-            String urlRegex = "/^(http(s)?:\\/\\/)[\\w.-]+(?:\\.[\\w\\.-]+)+[\\w\\-\\._~:/?#[\\]@!\\$&'\\(\\)\\*\\+,;=.]+$/gm]";
-            this.url = bufferedReader.readLine().trim();
-            if (!url.matches(urlRegex)){
-                this.url = "https://" + url;
-            }
+            String input = bufferedReader.readLine().trim();
+            this.urls = input.split(" ");
         }catch (IOException e){
             System.out.println(e.getMessage());
         }
@@ -57,7 +54,7 @@ public class ConsoleUserInput {
                 saveFilePath = bufferedReader.readLine();
             }
             else if (saveFilePath.toUpperCase().equals("N")){
-                saveFilePath = "";
+                saveFilePath = "default.md";
             }
             else {
                 readSaveFilePathFromConsole();
@@ -81,7 +78,7 @@ public class ConsoleUserInput {
                     readTargetLanguageFromConsole();
                 }
             }else if (translateLanguage.toUpperCase().equals("N")){
-                targetLanguage = null;
+                targetLanguage = Language.NONE;
             }else {
                 readTargetLanguageFromConsole();
             }
@@ -105,36 +102,20 @@ public class ConsoleUserInput {
         }
     }
 
-    public String getUrl() {
-        return url;
-    }
-
-    public void setUrl(String url) {
-        this.url = url;
+    public String[] getUrls() {
+        return urls;
     }
 
     public int getSearchDepth() {
         return searchDepth;
     }
 
-    public void setSearchDepth(int searchDepth) {
-        this.searchDepth = searchDepth;
-    }
-
     public String getSaveFilePath() {
         return saveFilePath;
     }
 
-    public void setSaveFilePath(String saveFilePath) {
-        this.saveFilePath = saveFilePath;
-    }
-
     public Language getTargetLanguage() {
         return targetLanguage;
-    }
-
-    public void setTargetLanguage(Language targetLanguage) {
-        this.targetLanguage = targetLanguage;
     }
 }
 
