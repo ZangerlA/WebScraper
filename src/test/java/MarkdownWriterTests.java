@@ -39,7 +39,7 @@ public class MarkdownWriterTests {
     @Test
     void WhenFileNameNotValidThenFallbackNameShouldBeChosen() throws IOException {
         createFile("///.");
-        file = MarkdownWriter.write(file, standardTestLinks, standardTestInfo);
+        MarkdownWriter.write(file, standardTestLinks, standardTestInfo);
         assertEquals("default.md", file.getName());
     }
 
@@ -80,7 +80,7 @@ public class MarkdownWriterTests {
 
     private void writeTestFile() throws IOException {
         createFile(testFileName);
-        file = MarkdownWriter.write(file, standardTestLinks, standardTestInfo);
+        MarkdownWriter.write(file, standardTestLinks, standardTestInfo);
     }
 
     private void createFile(String name) {

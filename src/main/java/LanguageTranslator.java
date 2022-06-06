@@ -28,7 +28,6 @@ public class LanguageTranslator {
     private static DeeplTranslation parseJson(HttpResponse<String> httpResponse, String text) {
         JsonParser jsonParser = new JsonParser();
         DeeplTranslation translation;
-
         try {
             DeeplResponse deeplResponse =  jsonParser.parse(httpResponse.body(), DeeplResponse.class);
             translation = deeplResponse.getElementAt(0);
